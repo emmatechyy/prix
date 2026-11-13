@@ -1,55 +1,100 @@
 @import "tailwindcss";
 
+/*
+  Design tokens. Visual language adapted from a light editorial template:
+  cool paper background, a single cobalt ink, serif display type over a grotesk text face,
+  pill controls, soft 16–20px cards with no hard borders, and blur-up appear motion.
+*/
 :root {
-  --bg: #07090c;
-  --surface: #0c1015;
-  --surface-2: #11161d;
-  --border: #1b222c;
-  --border-strong: #273140;
-  --text: #e7ebf1;
-  --muted: #8b95a5;
-  --faint: #5d6776;
-  --accent: #00e599;
-  --accent-dim: #00e59922;
-  --info: #6aa6ff;
-  --warn: #f2b84b;
-  --danger: #f2616e;
+  --bg: #e7ecf3; /* paper */
+  --surface: #f6f8fc; /* card */
+  --surface-2: #fbfcfe; /* raised / hover */
+  --tint: rgba(42, 63, 214, 0.08); /* cobalt wash, chips & answer bubbles */
+  --tint-strong: rgba(42, 63, 214, 0.14);
+  --border: rgba(42, 63, 214, 0.12); /* hairline */
+  --border-strong: rgba(42, 63, 214, 0.28);
+  --text: #2a3fd6; /* cobalt ink: headings, values */
+  --ink: #16218a; /* deep cobalt: dense numeric data */
+  --muted: #4f5fc2; /* secondary copy */
+  --faint: #5865bd; /* tertiary (≥4.5:1 on cards) */
+  --accent: #2a3fd6;
+  --accent-hover: #2234bb;
+  --on-accent: #e7ecf3;
+  --periwinkle: #c9d0f0;
+  --up: #157a46;
+  --up-fill: #1e9e5a;
+  --warn: #8a5a00;
+  --warn-fill: #f1e4a6;
+  --danger: #b42a36;
+  --danger-fill: #ff6b6b;
+  --shadow-pill: 0 8px 24px rgba(42, 63, 214, 0.1);
+  --shadow-float: 0 24px 48px rgba(12, 20, 90, 0.18);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-tint: var(--tint);
+  --color-tint-strong: var(--tint-strong);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-text: var(--text);
+  --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
   --color-accent: var(--accent);
-  --color-info: var(--info);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-periwinkle: var(--periwinkle);
+  --color-up: var(--up);
+  --color-up-fill: var(--up-fill);
+  --color-info: var(--accent);
   --color-warn: var(--warn);
+  --color-warn-fill: var(--warn-fill);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
+  --color-danger-fill: var(--danger-fill);
+  --font-sans: var(--font-host-grotesk);
+  --font-serif: var(--font-instrument-serif);
   --font-mono: var(--font-geist-mono);
+  --radius-card: 20px;
+  --radius-tile: 16px;
+  --radius-chip: 14px;
+  --shadow-pill: var(--shadow-pill);
+  --shadow-float: var(--shadow-float);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
   background: var(--bg);
+  scroll-behavior: smooth;
 }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  font-feature-settings: "ss01", "cv11";
+  font-family: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-x: clip; /* full-bleed bands use 100vw */
+}
+.font-serif {
+  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  font-weight: 400;
+}
+.display {
+  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
 }
 .num {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 ::selection {
-  background: #00e59944;
+  background: rgba(42, 63, 214, 0.2);
 }
 a {
   text-underline-offset: 3px;
@@ -57,41 +102,53 @@ a {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .scroll-x {
   overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
 }
+
+/* Data tables: hairline rows on the card surface, cobalt column labels. */
 table.data {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 table.data th {
   position: sticky;
   top: 0;
   background: var(--surface);
-  color: var(--faint);
+  color: var(--muted);
   font-weight: 500;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 12.5px;
   text-align: left;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-strong);
   white-space: nowrap;
 }
 table.data td {
-  padding: 9px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
   vertical-align: middle;
+  color: var(--ink);
+}
+table.data th:first-child,
+table.data td:first-child {
+  padding-left: 24px;
+}
+table.data th:last-child,
+table.data td:last-child {
+  padding-right: 24px;
 }
 table.data tr:last-child td {
   border-bottom: 0;
+}
+table.data tbody tr {
+  transition: background-color 0.2s var(--ease-out);
 }
 table.data tbody tr:hover td {
   background: var(--surface-2);
@@ -99,8 +156,35 @@ table.data tbody tr:hover td {
 table.data .r {
   text-align: right;
 }
+
+/* Appear motion: blur-up, as in the reference (0.7s, cubic-bezier(.23,1,.32,1), 14px rise, 4px blur). */
+@keyframes appear {
+  from {
+    opacity: 0.001;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.appear {
+  animation: appear 0.7s var(--ease-out) both;
+}
+.appear-1 { animation-delay: 0.06s; }
+.appear-2 { animation-delay: 0.12s; }
+.appear-3 { animation-delay: 0.18s; }
+.appear-4 { animation-delay: 0.24s; }
+
 @media (prefers-reduced-motion: reduce) {
-  * {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     transition: none !important;
   }

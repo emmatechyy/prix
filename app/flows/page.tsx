@@ -27,7 +27,7 @@ export default async function Flows() {
         Three lenses: liquidity by sector on RHEA, net buy/sell pressure per token from the latest swaps, and deposits/withdrawals through NEAR Intents — the chain-abstraction layer that moves assets in and out of NEAR. Every window is stated; short samples are labelled as such.
       </PageHeader>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
+      <div className="grid gap-4">
         <Card>
           <CardHeader title="Liquidity by sector (RHEA, clean pools)" subtitle="Value of each side of every verified pool, attributed to its token's sector. Pool volume is split 50/50 between its two sides." />
           {sectors ? (
@@ -42,7 +42,7 @@ export default async function Flows() {
                       <td className="r">
                         <span className="inline-flex items-center gap-2">
                           <span className="num text-muted">{pct(r.liquidity / sectors.total, 1)}</span>
-                          <span className="relative h-1 w-14 overflow-hidden rounded bg-border" aria-hidden><span className="absolute inset-y-0 left-0 bg-info" style={{ width: `${(r.liquidity / sectors.total) * 100}%` }} /></span>
+                          <span className="relative h-1 w-14 overflow-hidden rounded-full bg-tint-strong" aria-hidden><span className="absolute inset-y-0 left-0 rounded-full bg-accent" style={{ width: `${(r.liquidity / sectors.total) * 100}%` }} /></span>
                         </span>
                       </td>
                       <td className="r num">{usd(r.volume24h)}</td>
@@ -53,7 +53,7 @@ export default async function Flows() {
               </table>
             </div>
           ) : (
-            <div className="p-4">{!idx.ok && <SourceError what="RHEA pools" error={idx.e} />}</div>
+            <div className="px-5 pb-5 sm:px-6">{!idx.ok && <SourceError what="RHEA pools" error={idx.e} />}</div>
           )}
           <Sources urls={["https://api.rhea.finance/list-top-pools", "https://api.rhea.finance/get-24h-volume-list"]} note="24h volume covers all DCL pools and the 40 largest AMM pools." />
         </Card>
@@ -68,9 +68,9 @@ export default async function Flows() {
                   {tokenFlows.map((r) => (
                     <tr key={r.id}>
                       <td><TokenLink id={r.id} symbol={r.symbol} /></td>
-                      <td className="r num text-accent">{usd(r.flow!.buyUsd)}</td>
+                      <td className="r num text-up">{usd(r.flow!.buyUsd)}</td>
                       <td className="r num text-danger">{usd(r.flow!.sellUsd)}</td>
-                      <td className={`r num ${r.flow!.netUsd >= 0 ? "text-accent" : "text-danger"}`}>{usd(r.flow!.netUsd)}</td>
+                      <td className={`r num ${r.flow!.netUsd >= 0 ? "text-up" : "text-danger"}`}>{usd(r.flow!.netUsd)}</td>
                       <td className="r"><Delta v={r.flow!.pressure} digits={0} /></td>
                       <td className="r num text-muted">{mins(r.flow!.windowMs)}</td>
                       <td className="r"><Delta v={r.trend.tvl7d} /></td>
@@ -80,18 +80,18 @@ export default async function Flows() {
               </table>
             </div>
           ) : (
-            <div className="p-4 text-sm text-muted">{idx.ok ? "No priced swaps in the sampled pools." : <SourceError what="Swap samples" error={idx.e} />}</div>
+            <div className="px-5 pb-5 text-[14.5px] text-muted sm:px-6">{idx.ok ? "No priced swaps in the sampled pools." : <SourceError what="Swap samples" error={idx.e} />}</div>
           )}
           <Sources urls={["https://api.rhea.finance/get-recent-transaction-swap", "https://api.rhea.finance/get-recent-transaction-dcl-swap"]} note="Pool TVL change is in USD and includes price moves." />
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-4 grid gap-4">
         <Card>
           <CardHeader
             title="NEAR Intents — deposits vs withdrawals by asset"
             subtitle={flows.ok ? `Latest ${flows.v.events} intents.near token events spanning ${mins(flows.v.windowMs)}. MINT = deposit into Intents, BURN = withdrawal. USD at the price NearBlocks recorded on each event.` : undefined}
-            right={flows.ok ? <Badge tone={flows.v.inUsd >= flows.v.outUsd ? "accent" : "danger"}>net {usd(flows.v.inUsd - flows.v.outUsd)}</Badge> : undefined}
+            right={flows.ok ? <Badge tone={flows.v.inUsd >= flows.v.outUsd ? "up" : "danger"}>net {usd(flows.v.inUsd - flows.v.outUsd)}</Badge> : undefined}
           />
           {flows.ok ? (
             flows.v.rows.length ? (
@@ -103,9 +103,9 @@ export default async function Flows() {
                       <tr key={r.asset}>
                         <td className="font-medium" title={r.asset}>{r.symbol}</td>
                         <td><Badge>{intentsChain(r.asset)}</Badge></td>
-                        <td className="r num text-accent">{usd(r.inUsd)}</td>
+                        <td className="r num text-up">{usd(r.inUsd)}</td>
                         <td className="r num text-danger">{usd(r.outUsd)}</td>
-                        <td className={`r num ${r.netUsd >= 0 ? "text-accent" : "text-danger"}`}>{usd(r.netUsd)}</td>
+                        <td className={`r num ${r.netUsd >= 0 ? "text-up" : "text-danger"}`}>{usd(r.netUsd)}</td>
                         <td className="r num text-muted">{r.events}{r.unpriced ? <span className="text-faint"> ({r.unpriced} unpriced)</span> : null}</td>
                       </tr>
                     ))}
@@ -113,10 +113,10 @@ export default async function Flows() {
                 </table>
               </div>
             ) : (
-              <p className="p-4 text-sm text-muted">No deposits or withdrawals in the sampled events.</p>
+              <p className="px-5 pb-5 text-[14.5px] text-muted sm:px-6">No deposits or withdrawals in the sampled events.</p>
             )
           ) : (
-            <div className="p-4"><SourceError what="NEAR Intents events" error={flows.e} /></div>
+            <div className="px-5 pb-5 sm:px-6"><SourceError what="NEAR Intents events" error={flows.e} /></div>
           )}
           <Sources urls={flows.ok ? [flows.v.source] : []} note="Free-tier sample; a NEARBLOCKS_API_KEY widens the window." />
         </Card>
@@ -139,10 +139,10 @@ export default async function Flows() {
                   ))}
                 </tbody>
               </table>
-              {custody.v.flagged.length > 0 && <p className="border-t border-border px-4 py-2 text-xs text-warn">Excluded as likely mispriced (value &gt;10× the next asset): {custody.v.flagged.map((f) => `${f.symbol} (${usd(f.usd)})`).join(", ")}</p>}
+              {custody.v.flagged.length > 0 && <p className="border-t border-border px-5 py-3 text-[13px] sm:px-6 text-warn">Excluded as likely mispriced (value &gt;10× the next asset): {custody.v.flagged.map((f) => `${f.symbol} (${usd(f.usd)})`).join(", ")}</p>}
             </div>
           ) : (
-            <div className="p-4"><SourceError what="Intents balances" error={custody.e} /></div>
+            <div className="px-5 pb-5 sm:px-6"><SourceError what="Intents balances" error={custody.e} /></div>
           )}
           <Sources urls={custody.ok ? [custody.v.source, "https://api.rhea.finance/list-token-price"] : []} />
         </Card>

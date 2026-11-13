@@ -7,11 +7,11 @@ import { CUSTODY_ACCOUNTS } from "@/lib/model/registry";
 
 export const metadata: Metadata = { title: "Methodology" };
 
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({ id, title, children, wide }: { id: string; title: string; children: React.ReactNode; wide?: boolean }) {
   return (
-    <Card>
+    <Card className={wide ? "xl:col-span-2" : ""}>
       <CardHeader id={id} title={title} />
-      <div className="space-y-3 px-4 py-4 text-[13px] leading-relaxed text-muted break-words [&_code]:break-all [&_code]:num [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:text-text [&_li]:ml-4 [&_li]:list-disc [&_strong]:text-text">{children}</div>
+      <div className="space-y-3 px-5 pb-6 text-[15px] leading-[1.65] text-muted sm:px-6 break-words [&_code]:break-all [&_code]:num [&_code]:rounded-md [&_code]:bg-tint [&_code]:px-1 [&_code]:text-text [&_li]:ml-4 [&_li]:list-disc [&_strong]:text-text">{children}</div>
     </Card>
   );
 }
@@ -32,14 +32,14 @@ export default function Methodology() {
       <PageHeader eyebrow="Methodology" title="How every PRIX number is produced">
         PRIX is deterministic: the same upstream data gives the same scores. No language model writes a number or a verdict. Labels below (sectors, custody accounts) are curated by hand and listed in full so they can be challenged.
       </PageHeader>
-      <div className="grid gap-6 xl:grid-cols-2">
-        <Section id="sources" title="1. Data sources">
-          <div className="scroll-x -mx-4">
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Section id="sources" title="1. Data sources" wide>
+          <div className="scroll-x -mx-5 sm:-mx-6">
             <table className="data">
               <thead><tr><th>Source</th><th>Used for</th></tr></thead>
               <tbody>
                 {SOURCES.map(([n, u, w]) => (
-                  <tr key={n}><td className="align-top"><a className="text-info hover:underline" href={u} target="_blank" rel="noreferrer">{n} ↗</a></td><td className="whitespace-normal">{w}</td></tr>
+                  <tr key={n}><td className="align-top"><a className="text-accent hover:underline" href={u} target="_blank" rel="noreferrer">{n} ↗</a></td><td className="whitespace-normal">{w}</td></tr>
                 ))}
               </tbody>
             </table>

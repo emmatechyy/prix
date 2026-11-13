@@ -8,8 +8,8 @@ export const revalidate = 600;
 export const metadata: Metadata = { title: "Launch radar" };
 
 function C({ v }: { v: number | null }) {
-  if (v == null) return <span className="text-[11px] text-faint">n/r</span>;
-  return <span className={`num text-xs ${v >= 60 ? "text-accent" : v >= 35 ? "text-warn" : "text-danger"}`}>{v.toFixed(0)}</span>;
+  if (v == null) return <span className="text-[12px] text-faint italic">n/r</span>;
+  return <span className={`num text-xs ${v >= 60 ? "text-up" : v >= 35 ? "text-warn" : "text-danger"}`}>{v.toFixed(0)}</span>;
 }
 
 export default async function Launches() {
@@ -23,7 +23,7 @@ export default async function Launches() {
         <SourceError what="Launch radar" error={l.e} />
       ) : (
         <Card>
-          <CardHeader title={`${l.v.launches.length} launches scored`} subtitle={`Snapshot ${utc(l.v.asOf)} · scanned ${l.v.scanned.amm} AMM + ${l.v.scanned.dcl} DCL pools · ${l.v.scanned.candidates} candidates with ≥$1k verified liquidity; deepest ${l.v.launches.length} scored. Newest first.`} right={<a href="/api/v1/launches" className="text-info hover:underline">JSON ↗</a>} />
+          <CardHeader title={`${l.v.launches.length} launches scored`} subtitle={`Snapshot ${utc(l.v.asOf)} · scanned ${l.v.scanned.amm} AMM + ${l.v.scanned.dcl} DCL pools · ${l.v.scanned.candidates} candidates with ≥$1k verified liquidity; deepest ${l.v.launches.length} scored. Newest first.`} right={<a href="/api/v1/launches" className="text-accent hover:underline">JSON ↗</a>} />
           {l.v.launches.length ? (
             <div className="scroll-x">
               <table className="data">
@@ -35,7 +35,7 @@ export default async function Launches() {
                     <tr key={x.token}>
                       <td><TokenLink id={x.token} symbol={x.symbol} sub={x.token} /></td>
                       <td className="num text-muted">{x.createdAt ? <span title={new Date(x.createdAt).toISOString()}>{ago(x.createdAt)}</span> : <span className="text-faint">not reported</span>}</td>
-                      <td>{x.creator ? <a href={explorer.account(x.creator)} target="_blank" rel="noreferrer" className="num hover:text-info" title={x.creator}>{shortId(x.creator, 14)}</a> : <span className="text-faint">not resolved</span>}</td>
+                      <td>{x.creator ? <a href={explorer.account(x.creator)} target="_blank" rel="noreferrer" className="num hover:text-accent" title={x.creator}>{shortId(x.creator, 14)}</a> : <span className="text-faint">not resolved</span>}</td>
                       <td><ScoreBar score={x.score} size="sm" /></td>
                       <td className="r"><C v={x.components.liquidity} /></td>
                       <td className="r"><C v={x.components.distribution} /></td>

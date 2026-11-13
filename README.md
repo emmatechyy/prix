@@ -18,6 +18,7 @@ Built for **NEAR HACKATHON 2026**, track **Investment Thesis** (`thesis`).
 
 Holding a NEAR token means answering four questions. Can I exit without moving the price? Is the volume real? Who owns the supply? Is capital coming in or leaving? The raw data exists, but it is scattered, and much of it is misleading. For example, on 13 Nov 2026 a single RHEA pool reported about $683M of TVL, more than 10× the whole protocol. PRIX recomputes everything from reserves. It discards what fails integrity rules and shows its inputs, so an analyst can defend a position with evidence rather than conviction.
 
+
 ## Try it (judge walkthrough)
 
 Run it locally with the steps below, or use the hosted URL once it is deployed.
@@ -118,6 +119,23 @@ No database is required.
 | `GET /api/v1/launches` | launch radar |
 | `GET /api/v1/thesis` | hypotheses, rules, evidence, verdicts |
 
+## Design system
+
+The UI follows a light editorial design language (a Framer portfolio template was used only as a visual reference; no content, images or branding were taken). Tokens are in `app/globals.css`.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| Display font | Instrument Serif 400, tracking −0.02em, line-height ~0.98 | page titles (42/56/64px), section heads (44–72px), card titles (26–28px), stat values (30–40px) |
+| Text font | Host Grotesk 400/500 | body 15–17px, nav 16px, buttons 16px/500 |
+| Numeric font | Geist Mono, tabular figures | table values, IDs |
+| Paper / card / raised | `#e7ecf3` / `#f6f8fc` / `#fbfcfe` | page, cards, row hover |
+| Ink | `#2a3fd6` (cobalt), `#16218a` (dense data), `#4f5fc2` (secondary), `#5865bd` (tertiary) | all text ≥4.5:1 on cards |
+| Semantic | up `#157a46`, warn `#8a5a00` on `#f1e4a6`, down `#b42a36`, dots `#1e9e5a` / `#ff6b6b` | deltas, verdicts, flags |
+| Lines | `rgba(42,63,214,.12)` hairline, `.28` strong | table rows, chip outlines, footer rule |
+| Radii | cards 20px, tiles 16px, chips 14px, number keys 8px, pills 100px; bubbles 20/20/20/6 and 20/20/6/20 | |
+| Shadow | nav pill `0 8px 24px rgba(42,63,214,.1)`, menu `0 24px 48px rgba(12,20,90,.18)` | |
+| Motion | appear: opacity + 14px rise + 4px blur, 0.7s `cubic-bezier(.23,1,.32,1)`; 0.3s colour hovers; off under `prefers-reduced-motion` | |
+
 ## Project structure
 
 ```
@@ -141,7 +159,7 @@ screenshots/         380px and 1280px captures of every page
 ## Hackathon disclosure
 
 - Everything in this repository was written during NEAR HACKATHON 2026, starting 13 Nov 2026. There is no pre-hackathon baseline.
-- Libraries used: Next.js 16, React 19, Tailwind CSS 4, TradingView Lightweight Charts 5, Geist fonts, `server-only`, and tsx (dev, for the CLI). The code was written with AI assistance.
+- Libraries used: Next.js 16, React 19, Tailwind CSS 4, TradingView Lightweight Charts 5, Google Fonts via `next/font` (Instrument Serif, Host Grotesk, Geist Mono — all SIL OFL), `server-only`, and tsx (dev, for the CLI). The code was written with AI assistance.
 - License: MIT (see [LICENSE](LICENSE)).
 
 ## Screenshots

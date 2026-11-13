@@ -9,8 +9,8 @@ export const revalidate = 600;
 export const metadata: Metadata = { title: "PRIX Index" };
 
 function Pill({ s }: { s: number | null }) {
-  if (s == null) return <span className="text-[11px] text-faint">n/r</span>;
-  const c = s >= 60 ? "text-accent" : s >= 35 ? "text-warn" : "text-danger";
+  if (s == null) return <span className="text-[12px] text-faint italic">n/r</span>;
+  const c = s >= 60 ? "text-up" : s >= 35 ? "text-warn" : "text-danger";
   return <span className={`num text-xs ${c}`}>{s.toFixed(0)}</span>;
 }
 
@@ -43,13 +43,13 @@ export default async function Rankings() {
   return (
     <>
       <PageHeader eyebrow="PRIX Index" title="NEAR tokens ranked by evidence, not narrative">
-        Universe: non-stablecoin tokens with at least {usd(UNIVERSE_MIN_LIQUIDITY)} of verified liquidity on RHEA, top {UNIVERSE_MAX} by liquidity. Each score is 0–100; pillar weights are depth {WEIGHTS.depth * 100}%, activity {WEIGHTS.activity * 100}%, distribution {WEIGHTS.distribution * 100}%, flow {WEIGHTS.flow * 100}%. Tokens with under half the weight available are listed but not ranked. <Link href="/methodology" className="text-info hover:underline">Methodology</Link>.
+        Universe: non-stablecoin tokens with at least {usd(UNIVERSE_MIN_LIQUIDITY)} of verified liquidity on RHEA, top {UNIVERSE_MAX} by liquidity. Each score is 0–100; pillar weights are depth {WEIGHTS.depth * 100}%, activity {WEIGHTS.activity * 100}%, distribution {WEIGHTS.distribution * 100}%, flow {WEIGHTS.flow * 100}%. Tokens with under half the weight available are listed but not ranked. <Link href="/methodology" className="text-accent hover:underline">Methodology</Link>.
       </PageHeader>
       {!idx.ok ? (
         <SourceError what="The PRIX Index" error={idx.e} />
       ) : (
         <Card>
-          <CardHeader title={`${idx.v.rows.filter((r) => r.rank != null).length} ranked · ${idx.v.rows.filter((r) => r.rank == null).length} insufficient evidence`} subtitle={`Snapshot ${utc(idx.v.asOf)}. Depth = price impact + fees selling $${DEPTH_TRADE_USD.toLocaleString()} into USDC. Top-10 = share of float held by the 10 largest non-custody accounts. Flow = net buy pressure in the last 50 swaps.`} right={<a href="/api/v1/index" className="text-info hover:underline">JSON ↗</a>} />
+          <CardHeader title={`${idx.v.rows.filter((r) => r.rank != null).length} ranked · ${idx.v.rows.filter((r) => r.rank == null).length} insufficient evidence`} subtitle={`Snapshot ${utc(idx.v.asOf)}. Depth = price impact + fees selling $${DEPTH_TRADE_USD.toLocaleString()} into USDC. Top-10 = share of float held by the 10 largest non-custody accounts. Flow = net buy pressure in the last 50 swaps.`} right={<a href="/api/v1/index" className="text-accent hover:underline">JSON ↗</a>} />
           <div className="scroll-x max-h-[75vh]">
             <table className="data">
               <thead>

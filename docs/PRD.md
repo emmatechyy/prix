@@ -125,7 +125,7 @@ These were verified working on 13 Nov 2026. NearBlocks v1/v2 are switched off on
 | `/token/[contract]` | Evidence row per pillar with sources, pool history chart, top holders, all pools including rejected ones |
 | `/methodology` | Every rule, formula, curated label list, API reference, and known limits |
 
-UX principles: dark, terminal-grade, dense but readable tables, tabular figures in Geist Mono, every number with a source link, "not reported" instead of a guess, explicit sample windows, responsive down to 380px, skip link, `aria-current`, labelled charts, and reduced-motion respected.
+UX principles: a light editorial system (cool paper `#e7ecf3`, one cobalt ink `#2a3fd6`, Instrument Serif display over Host Grotesk text, pill controls, 16–20px cards without hard borders, blur-up appear motion), dense but readable hairline tables, tabular figures in Geist Mono, every number with a source link, "not reported" instead of a guess, explicit sample windows. Tokens live in `app/globals.css`; see README → Design system.
 
 ## 8. API
 

@@ -29,12 +29,12 @@ export function TimeChart({ series, height = 240, label }: { series: ChartSeries
     const chart: IChartApi = createChart(el, {
       height,
       autoSize: true,
-      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#8b95a5", fontFamily: "var(--font-geist-mono), ui-monospace, monospace", fontSize: 11, attributionLogo: false },
-      grid: { vertLines: { color: "#141a22" }, horzLines: { color: "#141a22" } },
-      rightPriceScale: { borderColor: "#1b222c" },
-      leftPriceScale: { visible: hasLeft, borderColor: "#1b222c" },
-      timeScale: { borderColor: "#1b222c" },
-      crosshair: { horzLine: { color: "#273140" }, vertLine: { color: "#273140" } },
+      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#4f5fc2", fontFamily: getComputedStyle(document.body).fontFamily, fontSize: 12, attributionLogo: false },
+      grid: { vertLines: { visible: false }, horzLines: { color: "rgba(42, 63, 214, 0.08)" } },
+      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } },
+      leftPriceScale: { visible: hasLeft, borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } },
+      timeScale: { borderColor: "rgba(42, 63, 214, 0.2)" },
+      crosshair: { horzLine: { color: "rgba(42, 63, 214, 0.35)", labelBackgroundColor: "#2a3fd6" }, vertLine: { color: "rgba(42, 63, 214, 0.35)", labelBackgroundColor: "#2a3fd6" } },
       handleScroll: false,
       handleScale: false,
     });
@@ -50,9 +50,9 @@ export function TimeChart({ series, height = 240, label }: { series: ChartSeries
         .sort((a, b) => a.t - b.t)
         .filter((d) => (seen.has(d.t) ? false : (seen.add(d.t), true)))
         .map((d) => ({ time: d.t as UTCTimestamp, value: d.value }));
-      if (s.type === "histogram") chart.addSeries(HistogramSeries, { ...opts, color: s.color }).setData(data);
+      if (s.type === "histogram") chart.addSeries(HistogramSeries, { ...opts, color: s.color + "b3" }).setData(data);
       else if (s.type === "line") chart.addSeries(LineSeries, { ...opts, color: s.color, lineWidth: 2 }).setData(data);
-      else chart.addSeries(AreaSeries, { ...opts, lineColor: s.color, topColor: s.color + "33", bottomColor: s.color + "00", lineWidth: 2 }).setData(data);
+      else chart.addSeries(AreaSeries, { ...opts, lineColor: s.color, topColor: s.color + "2e", bottomColor: s.color + "03", lineWidth: 2 }).setData(data);
     }
     chart.timeScale().fitContent();
     return () => chart.remove();
@@ -60,10 +60,10 @@ export function TimeChart({ series, height = 240, label }: { series: ChartSeries
   return (
     <figure>
       <div ref={ref} role="img" aria-label={label} style={{ height }} />
-      <figcaption className="mt-2 flex flex-wrap gap-3 text-[11px] text-muted">
+      <figcaption className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-sm" style={{ background: s.color }} aria-hidden />
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} aria-hidden />
             {s.name}
           </span>
         ))}

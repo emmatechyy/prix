@@ -44,3 +44,6 @@ next-env.d.ts
 
 # PRIX snapshots (re-generate with `pnpm snapshot`)
 /data/snapshots/
+
+# third-party design reference captures: local only, never published
+/screenshots/reference/

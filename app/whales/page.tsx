@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Whale tracking" };
 function Account({ id }: { id: string | null }) {
   if (!id) return <span className="text-faint">not resolved</span>;
   return (
-    <a href={explorer.account(id)} target="_blank" rel="noreferrer" className="num text-text hover:text-info" title={id}>
+    <a href={explorer.account(id)} target="_blank" rel="noreferrer" className="num text-text hover:text-accent" title={id}>
       {shortId(id, 16)}
     </a>
   );
@@ -18,7 +18,7 @@ function Account({ id }: { id: string | null }) {
 function Tx({ hash, receipt }: { hash: string | null; receipt: string }) {
   if (hash)
     return (
-      <a href={explorer.tx(hash)} target="_blank" rel="noreferrer" className="num text-info hover:underline" title={hash}>
+      <a href={explorer.tx(hash)} target="_blank" rel="noreferrer" className="num text-accent hover:underline" title={hash}>
         {shortId(hash, 8)} ↗
       </a>
     );
@@ -35,8 +35,8 @@ export default async function Whales() {
       {!w.ok ? (
         <SourceError what="Whale data" error={w.e} />
       ) : (
-        <div className="space-y-6">
-          <p className="text-xs text-faint">
+        <div className="space-y-4">
+          <p className="text-[14px] text-muted">
             Snapshot {utc(w.v.asOf)} · {num(w.v.sampled.swaps)} swaps from {w.v.sampled.swapPools} pools (oldest {ago(w.v.sampled.oldestSwapTs)}) · {num(w.v.sampled.lpEvents)} liquidity events from {w.v.sampled.lpPools} pools{w.v.unresolved ? ` · ${w.v.unresolved} of the traced events could not be resolved to a transaction` : ""}
           </p>
           <Card>
@@ -49,11 +49,11 @@ export default async function Whales() {
                     {w.v.swaps.slice(0, 40).map((s) => (
                       <tr key={s.receipt_id}>
                         <td className="num text-muted" title={new Date(s.ts).toISOString()}>{ago(s.ts)}</td>
-                        <td><span className="text-danger">{s.symbols[0]}</span> <span className="text-faint">→</span> <span className="text-accent">{s.symbols[1]}</span></td>
+                        <td><span className="text-danger">{s.symbols[0]}</span> <span className="text-faint">→</span> <span className="text-up">{s.symbols[1]}</span></td>
                         <td className="r num">{usd(s.usd)}</td>
                         <td><Account id={s.signer} /></td>
                         <td><Tx hash={s.txHash} receipt={s.receipt_id} /></td>
-                        <td><a className="num text-faint hover:text-info" href={explorer.rheaPool(s.poolId)} target="_blank" rel="noreferrer" title={s.poolId}>{shortId(s.poolId, 8)}</a></td>
+                        <td><a className="num text-faint hover:text-accent" href={explorer.rheaPool(s.poolId)} target="_blank" rel="noreferrer" title={s.poolId}>{shortId(s.poolId, 8)}</a></td>
                       </tr>
                     ))}
                   </tbody>
@@ -64,7 +64,7 @@ export default async function Whales() {
             )}
           </Card>
 
-          <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+          <div className="grid gap-4">
             <Card>
               <CardHeader title={`Large liquidity moves (${w.v.lps.length})`} subtitle="Adds and removals of liquidity in the deepest verified pools, newest first." />
               {w.v.lps.length ? (
@@ -75,7 +75,7 @@ export default async function Whales() {
                       {w.v.lps.slice(0, 25).map((l) => (
                         <tr key={l.receipt_id}>
                           <td className="num text-muted">{ago(l.ts)}</td>
-                          <td><Badge tone={l.method === "add" ? "accent" : "danger"}>{l.method === "add" ? "add" : "remove"}</Badge></td>
+                          <td><Badge tone={l.method === "add" ? "up" : "danger"}>{l.method === "add" ? "add" : "remove"}</Badge></td>
                           <td>{l.symbols.join(" / ")}</td>
                           <td className="r num">{usd(l.usd)}</td>
                           <td><Account id={l.signer} /></td>
@@ -100,7 +100,7 @@ export default async function Whales() {
                         <tr key={a.account}>
                           <td><Account id={a.account} /></td>
                           <td className="r num">{a.swapUsd ? usd(a.swapUsd) : "—"}</td>
-                          <td className="r num text-accent">{a.lpAddUsd ? usd(a.lpAddUsd) : "—"}</td>
+                          <td className="r num text-up">{a.lpAddUsd ? usd(a.lpAddUsd) : "—"}</td>
                           <td className="r num text-danger">{a.lpRemoveUsd ? usd(a.lpRemoveUsd) : "—"}</td>
                           <td className="r num text-muted">{a.events}</td>
                         </tr>
