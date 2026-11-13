@@ -125,9 +125,10 @@ export function ScoreBar({ score, size = "md" }: { score: number | null; size?: 
 }
 
 export function SourceLink({ href, compact, label }: { href: string; compact?: boolean; label?: string }) {
-  const isUrl = /^https?:\/\//.test(href) && !/<|%3C/i.test(href);
+  const internal = href.startsWith("/");
+  const isUrl = (internal || /^https?:\/\//.test(href)) && !/<|%3C/i.test(href);
   if (!isUrl) return <span className="num text-[12px] text-faint">{label ?? decodeURIComponent(href)}</span>;
-  const host = new URL(href).host;
+  const host = internal ? href : new URL(href).host;
   return (
     <a href={href} target="_blank" rel="noreferrer" className="text-[12.5px] text-faint underline-offset-4 transition-colors hover:text-text hover:underline" title={href}>
       <span className="whitespace-nowrap">{compact ? "src ↗" : (label ?? host) + " ↗"}</span>
