@@ -90,10 +90,13 @@ if (!offline) {
   const vf = computeVerdicts(fresh, th.rules, th.t);
   for (const a of v1) {
     const b = vf.find((x) => x.id === a.id)!;
-    if (a.verdict === b.verdict) ok(`${a.id} verdict ${a.verdict} reproduced (metric ${a.metric_label} → ${b.metric_label})`);
+    if (a.verdict === b.verdict) ok(`${a.id} verdict ${a.verdict} reproduced (${a.metric_label}: ${fmtv(a.metric_value)} → ${fmtv(b.metric_value)})`);
     else if (allowDrift) ok(`${a.id} verdict drifted ${a.verdict} → ${b.verdict} (allowed by --allow-verdict-drift)`);
-    else bad(`${a.id} verdict ${a.verdict} → ${b.verdict} (metric ${a.metric_label} → ${b.metric_label})`);
+    else bad(`${a.id} verdict ${a.verdict} → ${b.verdict} (${a.metric_label}: ${fmtv(a.metric_value)} → ${fmtv(b.metric_value)})`);
   }
+}
+function fmtv(v: number | null) {
+  return v == null ? "not reported" : Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("en-US") : v.toFixed(4);
 }
 function addDaysLocal(d: string, n: number) {
   const t = new Date(d + "T00:00:00Z");
