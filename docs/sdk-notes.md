@@ -9,7 +9,8 @@ signs or deposits, and no `execute*`, `swap*`, `build*`, `submit*`, relayer or M
 |---|---|---|
 | `findPath` | `findPath({ amountIn, tokenIn, tokenOut, slippage })` → GET `smartrouter.rhea.finance/findPath` | The **same endpoint** is called directly by `lib/sources/rhea.ts → findPath` (`pathDeep=3, slippage=0.005`). This is the RHEA Smart Router **V1** in `lib/depth/rhea-router.ts`. |
 | `intentsQuotation` | `({ originAsset, destinationAsset, amount, refundTo, recipient, customRecipientMsg?, isReverse?, dry?, slippageTolerance?, authorization? })` → `IIntentsQuoteResult { quoteStatus: "success" \| "error", quoteSuccessResult?, message?, quoteFeeData? }` | Not used. It proxies through `api.rhea.finance/api/1click/quote` and adds RHEA's own fee. PRIX calls the documented 1Click API directly instead, so a third party is not between PRIX and the quote. |
-| `getAssets`, `getPrices`, `batchViews`, `config_near` | lending (Burrow) views | Reserved for the P1 Fundamentals block (`lib/rhea/lending.ts`, not built yet). |
+| `batchViews` | `batchViews(account_id?) → ILendingData { assets_paged_detailed, config, token_pyth_infos, account_all_positions? }` | **Used** with no account id by `lib/rhea/lending.ts` for the Fundamentals block on /flows: RHEA Lending (Burrow) read-only views, supplied/borrowed per asset (token decimals + `extra_decimals`), APRs as fractions. |
+| `getAssets`, `getPrices` | lending asset/price views | Not used (batchViews already returns them). |
 
 ## `@rhea-finance/cross-chain-aggregation-dex` 2.1.9
 

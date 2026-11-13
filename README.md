@@ -30,7 +30,7 @@ pnpm verify        # online: refetch every source, rebuild in memory, diff again
 `pnpm verdicts --snapshot data/snapshots/2026-11-13.json` pins a specific file. `pnpm verify --offline` skips the
 refetch; `--tolerance 0.10` (point-in-time values) and `--history-tolerance 0.01` (days before the snapshot) set the
 allowed drift; `--allow-verdict-drift` reports but does not fail on a changed verdict. Thresholds come from
-`thresholds/v1.yaml` (**DRAFT, not locked**, see `docs/threshold-diff.md`).
+`thresholds/v1.yaml` (**DRAFT, not locked**, see `docs/threshold-diff.md`). A standard-library Python cross-check of the hash and of H2/H3/H6 is in `notebooks/rerun.ipynb`.
 
 ## Try it (judge walkthrough)
 

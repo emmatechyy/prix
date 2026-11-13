@@ -22,6 +22,12 @@
 | **Index universe** | min clean liquidity $50k (same) | `min_liquidity_usd: 50000` (same). New: `max_price_impact_10k: 0.10` | No. Tokens below either rule get a **low confidence** badge and drop below every high-confidence token, so they are excluded from the top-ranked view. A token with no measured $10k depth is also low confidence, so it never outranks a token with measured depth. |
 | **Index weights** | depth .30 / activity .25 / distribution .20 / flow .25 | identical | No |
 
+## Results to sanity-check before locking (snapshot 2026-11-13)
+
+* **H4 reads 100% organic.** The 15 largest rejected pools have almost no daily volume in the RHEA data service, and none of the 25 highest-volume clean pools contains a token flagged for round-trip or abnormal turnover today. The rule as written is therefore easy to pass. If wash trading in *clean* pools is the concern, a stricter "flagged" definition is needed, for example a turnover threshold on each pool.
+* **H6 baseline.** The exploit window began 2026-09-29 16:14 UTC, so the 7-day baseline (09-24 to 09-30) includes about 1.3 days of it. Custody at constant prices was rising in that week (from $109M to $122M), so the baseline median ($120.6M) is high relative to day 30 ($101.0M, 84%). Shifting the baseline to 09-22 to 09-28 would change the custody ratio. This is a human decision.
+* **H5 sample.** The backfill holds 249 buckets and 24,900 events over 31 days, but only about 4 hours of activity are actually sampled. The sign of the net flow is meaningful. The size is not.
+
 ## Evidence grades
 
 The YAML grades every claim **B** (indexer/API). PRIX downgrades H3 to **C** when a passing token's

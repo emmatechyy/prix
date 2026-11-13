@@ -242,7 +242,8 @@ function SampledFlows({ s, w, version, locked }: { s: Snapshot; w: W; version: n
             </div>
           ))}
           <p className="col-span-2 text-[13px] text-muted sm:col-span-4">
-            {num(cur.n)} sampled windows covering {cur.minutes < 120 ? `${cur.minutes.toFixed(1)} min` : `${(cur.minutes / 60).toFixed(1)} h`} of activity since {cur.first?.slice(0, 16).replace("T", " ")} UTC · {num(cur.mints)} mints, {num(cur.burns)} burns, {num(cur.unpriced)} unpriced (excluded) ·{" "}
+            {num(cur.n)} sampled windows covering {cur.minutes < 120 ? `${cur.minutes.toFixed(1)} min` : `${(cur.minutes / 60).toFixed(1)} h`} of activity since {cur.first?.slice(0, 16).replace("T", " ")} UTC · {num(cur.mints)} mints, {num(cur.burns)} burns, {num(cur.unpriced)} unpriced (excluded) · plain sum of the samples (H5 uses a day-weighted sum so denser sampling on recent days does not dominate; see{" "}
+            <Link href="/thesis#H5" className="underline underline-offset-4 hover:text-text">H5</Link>) ·{" "}
             <a href={`/api/v1/snapshots/${s.date}`} className="underline underline-offset-4 hover:text-text">snapshot</a> ·{" "}
             <a href="https://api.nearblocks.io/v3/intents/txns?limit=100" target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text">NearBlocks /v3/intents/txns ↗</a>
           </p>
