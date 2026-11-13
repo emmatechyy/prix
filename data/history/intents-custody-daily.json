@@ -1,0 +1,755 @@
+{
+ "account": "intents.near",
+ "days": [
+  {
+   "date": "2026-09-19",
+   "block": 216269256,
+   "block_ts": "2026-09-19T00:00:00.615Z",
+   "balances": {
+    "wrap.near": "10953352374218099810074187530127",
+    "zec.omft.near": "3003700262151",
+    "nbtc.bridge.near": "15461300955",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "956825957440",
+    "token.rhealab.near": "16532578661521375727617167",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11076611826169240073621391",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-20",
+   "block": 216412272,
+   "block_ts": "2026-09-20T00:00:00.480Z",
+   "balances": {
+    "wrap.near": "12232104916842849356258416446157",
+    "zec.omft.near": "3110911336478",
+    "nbtc.bridge.near": "15301447288",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "895774631039",
+    "token.rhealab.near": "16556877101914672673106883",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10479873357408680380356269",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-21",
+   "block": 216553376,
+   "block_ts": "2026-09-21T00:00:00.085Z",
+   "balances": {
+    "wrap.near": "12943132463849309889194634817452",
+    "zec.omft.near": "3090263888181",
+    "nbtc.bridge.near": "14935190921",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "874543439920",
+    "token.rhealab.near": "16131918308752563996145488",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10185372518682401344204175",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-22",
+   "block": 216696053,
+   "block_ts": "2026-09-22T00:00:00.169Z",
+   "balances": {
+    "wrap.near": "14409413873178233818400163647116",
+    "zec.omft.near": "3020886142996",
+    "nbtc.bridge.near": "14617494351",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1065699137206",
+    "token.rhealab.near": "16663779139001664812609897",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10972402248728468794847956",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-23",
+   "block": 216835292,
+   "block_ts": "2026-09-23T00:00:00.381Z",
+   "balances": {
+    "wrap.near": "16856548134014184818240117956854",
+    "zec.omft.near": "3327176064334",
+    "nbtc.bridge.near": "14805022092",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1155325793307",
+    "token.rhealab.near": "17290700605905616215216885",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10613567152265205395450402",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-24",
+   "block": 216976125,
+   "block_ts": "2026-09-24T00:00:00.380Z",
+   "balances": {
+    "wrap.near": "18867182622620409494269712898317",
+    "zec.omft.near": "3380750344457",
+    "nbtc.bridge.near": "15626823859",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1031624606473",
+    "token.rhealab.near": "17093197237450519762988347",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10414084231493600231114326",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-25",
+   "block": 217118982,
+   "block_ts": "2026-09-25T00:00:00.078Z",
+   "balances": {
+    "wrap.near": "20823952894990183597450119915072",
+    "zec.omft.near": "3403844887074",
+    "nbtc.bridge.near": "14422848012",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1017001938775",
+    "token.rhealab.near": "17832885916338301856215289",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11944695174234516870768074",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-26",
+   "block": 217263877,
+   "block_ts": "2026-09-26T00:00:00.328Z",
+   "balances": {
+    "wrap.near": "22200893126624113780118636810834",
+    "zec.omft.near": "3307292129411",
+    "nbtc.bridge.near": "16750579917",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1246455663263",
+    "token.rhealab.near": "18375423180238519031315150",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "12384842339266674135588955",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-27",
+   "block": 217410112,
+   "block_ts": "2026-09-27T00:00:00.497Z",
+   "balances": {
+    "wrap.near": "22600613284594055962138376022145",
+    "zec.omft.near": "3212073501738",
+    "nbtc.bridge.near": "17153745960",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1173490446148",
+    "token.rhealab.near": "18336941586225171940936160",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "12154571980640408911291274",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-28",
+   "block": 217555962,
+   "block_ts": "2026-09-28T00:00:00.103Z",
+   "balances": {
+    "wrap.near": "22846305173818694991807404063369",
+    "zec.omft.near": "3114520452186",
+    "nbtc.bridge.near": "15237716840",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1591882443044",
+    "token.rhealab.near": "18742464054183378133222452",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11896446803086912467908131",
+    "qtc.omft.near": "absent",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-29",
+   "block": 217701689,
+   "block_ts": "2026-09-29T00:00:00.342Z",
+   "balances": {
+    "wrap.near": "22884874799766091900682149313095",
+    "zec.omft.near": "3159861990166",
+    "nbtc.bridge.near": "16428295628",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1900425277402",
+    "token.rhealab.near": "16733571010022694458178578",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11897441492404551368045548",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-09-30",
+   "block": 217845404,
+   "block_ts": "2026-09-30T00:00:00.358Z",
+   "balances": {
+    "wrap.near": "20566919318427737055032305982658",
+    "zec.omft.near": "3300609441631",
+    "nbtc.bridge.near": "16957280827",
+    "qtc.omft.near": "0",
+    "token.rhealab.near": "16391217868515079935771455",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11978218570771848153658493",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1896985458909",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-01",
+   "block": 217984974,
+   "block_ts": "2026-10-01T00:00:00.172Z",
+   "balances": {
+    "wrap.near": "20365314331186388310864802996230",
+    "zec.omft.near": "3245877748172",
+    "nbtc.bridge.near": "13348169707",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1932185644059",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "15507974589029815034051215",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11839546811411819165758176"
+   }
+  },
+  {
+   "date": "2026-10-02",
+   "block": 218126921,
+   "block_ts": "2026-10-02T00:00:00.370Z",
+   "balances": {
+    "wrap.near": "20417117817693485257157241809434",
+    "zec.omft.near": "3145955699979",
+    "nbtc.bridge.near": "14850561789",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1931858859657",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "15551890184319182114714440",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11834281998769106091536960"
+   }
+  },
+  {
+   "date": "2026-10-03",
+   "block": 218273403,
+   "block_ts": "2026-10-03T00:00:00.607Z",
+   "balances": {
+    "wrap.near": "20724155010469586692599560842858",
+    "zec.omft.near": "3148839694652",
+    "nbtc.bridge.near": "14031255842",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1838690177007",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "15563200425130944698882160",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11870501950763483081263003"
+   }
+  },
+  {
+   "date": "2026-10-04",
+   "block": 218420665,
+   "block_ts": "2026-10-04T00:00:00.013Z",
+   "balances": {
+    "wrap.near": "20547737718485002778280329286412",
+    "nbtc.bridge.near": "14190707732",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "1935275400759",
+    "token.rhealab.near": "14451752506859380361734418",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11802078942563576372443746",
+    "zec.omft.near": "3140129384010",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-05",
+   "block": 218567717,
+   "block_ts": "2026-10-05T00:00:00.496Z",
+   "balances": {
+    "wrap.near": "19004698978267154033813040883386",
+    "zec.omft.near": "3157106117751",
+    "nbtc.bridge.near": "13357154935",
+    "qtc.omft.near": "0",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "2003479569548",
+    "token.rhealab.near": "14392110567156124380136132",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11786686684786091127861754",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-06",
+   "block": 218714583,
+   "block_ts": "2026-10-06T00:00:00.494Z",
+   "balances": {
+    "wrap.near": "18615337467664676879186081000080",
+    "zec.omft.near": "3321328481730",
+    "nbtc.bridge.near": "13091167718",
+    "qtc.omft.near": "2731000000000",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3242181749393",
+    "token.rhealab.near": "14823739696210683459884918",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11681307892612332504403592",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-07",
+   "block": 218861416,
+   "block_ts": "2026-10-07T00:00:00.340Z",
+   "balances": {
+    "wrap.near": "18396351781603493605016897480503",
+    "zec.omft.near": "3237320225579",
+    "nbtc.bridge.near": "12379764732",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4840693604163",
+    "token.rhealab.near": "14694811030929159549355909",
+    "qtc.omft.near": "83684427681627581",
+    "prl.omft.near": "absent",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11525208947345816148258810"
+   }
+  },
+  {
+   "date": "2026-10-08",
+   "block": 219007407,
+   "block_ts": "2026-10-08T00:00:00.345Z",
+   "balances": {
+    "wrap.near": "17507392033360825656462302696506",
+    "zec.omft.near": "3255950573496",
+    "nbtc.bridge.near": "11424842528",
+    "qtc.omft.near": "107190262566233349",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4386744126228",
+    "token.rhealab.near": "14667889981116658232535667",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11565181392663968274860976",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-09",
+   "block": 219154120,
+   "block_ts": "2026-10-09T00:00:00.384Z",
+   "balances": {
+    "wrap.near": "18066691611505432439708947434648",
+    "zec.omft.near": "3150240847823",
+    "nbtc.bridge.near": "14146500239",
+    "qtc.omft.near": "152692652914341654",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4606371499448",
+    "token.rhealab.near": "14759522012623766208015978",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11740185143416095646621222",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-10",
+   "block": 219300782,
+   "block_ts": "2026-10-10T00:00:00.096Z",
+   "balances": {
+    "wrap.near": "18261574735521260670251835957090",
+    "zec.omft.near": "3335196645706",
+    "nbtc.bridge.near": "15275980334",
+    "qtc.omft.near": "119728000040808664",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4733908440525",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "14789867017395629762609190",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11572360065456840917889199"
+   }
+  },
+  {
+   "date": "2026-10-11",
+   "block": 219447523,
+   "block_ts": "2026-10-11T00:00:00.441Z",
+   "balances": {
+    "wrap.near": "17858212958415046014993688613322",
+    "zec.omft.near": "3301649554762",
+    "nbtc.bridge.near": "15539152720",
+    "qtc.omft.near": "128291745476011609",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4657075772519",
+    "token.rhealab.near": "14806645926957577587127911",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "11073666739859255370147783",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-12",
+   "block": 219594857,
+   "block_ts": "2026-10-12T00:00:00.431Z",
+   "balances": {
+    "wrap.near": "17905452259532002220088739099450",
+    "zec.omft.near": "3366842985215",
+    "nbtc.bridge.near": "12714457294",
+    "qtc.omft.near": "135166913893460733",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4521126753314",
+    "token.rhealab.near": "15285488173536487272641053",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10871967422989676325841123",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-13",
+   "block": 219740458,
+   "block_ts": "2026-10-13T00:00:00.032Z",
+   "balances": {
+    "wrap.near": "17184100111320961474627279601020",
+    "zec.omft.near": "3360272109354",
+    "nbtc.bridge.near": "12639498603",
+    "qtc.omft.near": "129640423622391227",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4922202713372",
+    "token.rhealab.near": "15274828368986096253521213",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10900117735394330435788965",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-14",
+   "block": 219879156,
+   "block_ts": "2026-10-14T00:00:01.152Z",
+   "balances": {
+    "wrap.near": "17193608695218760957701475817195",
+    "zec.omft.near": "3282569495997",
+    "nbtc.bridge.near": "14608944042",
+    "qtc.omft.near": "124028138491099697",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4653022899813",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "15273455501637967438414474",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10945226844761950046838555"
+   }
+  },
+  {
+   "date": "2026-10-15",
+   "block": 220001294,
+   "block_ts": "2026-10-15T00:00:00.074Z",
+   "balances": {
+    "wrap.near": "16969332671297579371553030843709",
+    "zec.omft.near": "3223674582898",
+    "qtc.omft.near": "114672419538345376",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4797872955094",
+    "token.rhealab.near": "15361373678765347555585215",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10845233600208007376843288",
+    "nbtc.bridge.near": "14309970529",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-20",
+   "block": 220726930,
+   "block_ts": "2026-10-20T00:00:00.548Z",
+   "balances": {
+    "wrap.near": "16613439720384067630464879812792",
+    "zec.omft.near": "3182586387397",
+    "nbtc.bridge.near": "14722587200",
+    "qtc.omft.near": "104689747690489342",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4556142703932",
+    "token.rhealab.near": "15445126200613864035836597",
+    "prl.omft.near": "absent",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10716534590252301442151362"
+   }
+  },
+  {
+   "date": "2026-10-21",
+   "block": 220871336,
+   "block_ts": "2026-10-21T00:00:00.533Z",
+   "balances": {
+    "wrap.near": "16824195108075149355258721615577",
+    "zec.omft.near": "3088822694507",
+    "nbtc.bridge.near": "16823947503",
+    "qtc.omft.near": "103550471343676186",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4415356277732",
+    "token.rhealab.near": "15446045921811332182155775",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10384576960478624943992766",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "block": 221015566,
+   "block_ts": "2026-10-22T00:00:00.423Z",
+   "balances": {
+    "wrap.near": "16918049726684397778981440538095",
+    "zec.omft.near": "2915406702293",
+    "nbtc.bridge.near": "13192601447",
+    "qtc.omft.near": "105934313484206316",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4467654145316",
+    "token.rhealab.near": "15361861572885611367097939",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9931891560680876955427436",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-23",
+   "block": 221162121,
+   "block_ts": "2026-10-23T00:00:00.446Z",
+   "balances": {
+    "wrap.near": "16323634309512147252265423038046",
+    "zec.omft.near": "2933967108639",
+    "nbtc.bridge.near": "14481492852",
+    "qtc.omft.near": "104402247601805980",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4468924559498",
+    "prl.omft.near": "absent",
+    "token.rhealab.near": "14029911604863574598854937",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9929950790462856322744776"
+   }
+  },
+  {
+   "date": "2026-10-24",
+   "block": 221310107,
+   "block_ts": "2026-10-24T00:00:00.002Z",
+   "balances": {
+    "wrap.near": "16310868357536671956214401088499",
+    "zec.omft.near": "2894801196827",
+    "nbtc.bridge.near": "14980697726",
+    "qtc.omft.near": "99224671644556894",
+    "token.rhealab.near": "14027760915721590530714793",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10019004675410653490636127",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4460521678578",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-25",
+   "block": 221460754,
+   "block_ts": "2026-10-25T00:00:00.086Z",
+   "balances": {
+    "wrap.near": "16215960162829493331902676995718",
+    "zec.omft.near": "2896123945902",
+    "nbtc.bridge.near": "13860290324",
+    "qtc.omft.near": "94357846170533075",
+    "token.rhealab.near": "14051467652168285887589916",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10026779736099775447372646",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4594621232571",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-26",
+   "block": 221609942,
+   "block_ts": "2026-10-26T00:00:00.465Z",
+   "balances": {
+    "wrap.near": "16169649146509103056106681528464",
+    "zec.omft.near": "2898387555870",
+    "nbtc.bridge.near": "14226289174",
+    "qtc.omft.near": "94101925482769992",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4666355685467",
+    "token.rhealab.near": "14168915022984402908000960",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9987436963388699320568563",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-27",
+   "block": 221760244,
+   "block_ts": "2026-10-27T00:00:00.452Z",
+   "balances": {
+    "wrap.near": "16221417386339017261306881848746",
+    "zec.omft.near": "2887712105587",
+    "nbtc.bridge.near": "15291672575",
+    "qtc.omft.near": "95183707369762018",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4365813493494",
+    "token.rhealab.near": "14116137152797700358827449",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10050896095507643571095009",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "block": 221897841,
+   "block_ts": "2026-10-28T00:00:00.389Z",
+   "balances": {
+    "wrap.near": "16399740295776081399530295496525",
+    "zec.omft.near": "2949746562434",
+    "nbtc.bridge.near": "15244375696",
+    "qtc.omft.near": "95187625983548771",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4008783428626",
+    "token.rhealab.near": "14636453637704940928354220",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10695146168812390565590825",
+    "prl.omft.near": "absent"
+   }
+  },
+  {
+   "date": "2026-10-29",
+   "block": 222047184,
+   "block_ts": "2026-10-29T00:00:00.576Z",
+   "balances": {
+    "wrap.near": "16397836587651961983091239907037",
+    "zec.omft.near": "3030283826466",
+    "nbtc.bridge.near": "15310638292",
+    "qtc.omft.near": "96973767279198061",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4067228244749",
+    "prl.omft.near": "100400000",
+    "token.rhealab.near": "14440696821209895441987261",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10653614779396947865480031"
+   }
+  },
+  {
+   "date": "2026-10-30",
+   "block": 222194973,
+   "block_ts": "2026-10-30T00:00:00.574Z",
+   "balances": {
+    "wrap.near": "16274055380656041429761106587270",
+    "zec.omft.near": "3261388190152",
+    "nbtc.bridge.near": "15021225169",
+    "qtc.omft.near": "93330673467777922",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4227502546138",
+    "prl.omft.near": "199400000",
+    "token.rhealab.near": "14392663333522765392636801",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10721966443609080111508597"
+   }
+  },
+  {
+   "date": "2026-10-31",
+   "block": 222343159,
+   "block_ts": "2026-10-31T00:00:00.464Z",
+   "balances": {
+    "wrap.near": "16332387585866829572002795532392",
+    "zec.omft.near": "3234406741394",
+    "nbtc.bridge.near": "13800980767",
+    "qtc.omft.near": "94129660943038808",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4446544254159",
+    "prl.omft.near": "1500100604960",
+    "token.rhealab.near": "14341845552732506489513960",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10583526861265742182755953"
+   }
+  },
+  {
+   "date": "2026-11-01",
+   "block": 222491356,
+   "block_ts": "2026-11-01T00:00:00.175Z",
+   "balances": {
+    "wrap.near": "16285825493606734023117607684050",
+    "zec.omft.near": "3152791839962",
+    "nbtc.bridge.near": "18609062693",
+    "qtc.omft.near": "96022689818375104",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4491993679922",
+    "prl.omft.near": "1551601104960",
+    "token.rhealab.near": "14423841046547391577672970",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10459082026311031242502406"
+   }
+  },
+  {
+   "date": "2026-11-02",
+   "block": 222641210,
+   "block_ts": "2026-11-02T00:00:00.260Z",
+   "balances": {
+    "wrap.near": "16326392101515901810212719887922",
+    "zec.omft.near": "3056867951197",
+    "nbtc.bridge.near": "13592952982",
+    "qtc.omft.near": "94861860756010035",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "4690668138970",
+    "prl.omft.near": "3605188494828",
+    "token.rhealab.near": "14435366265214868864302708",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10533482577261139314080170"
+   }
+  },
+  {
+   "date": "2026-11-03",
+   "block": 222791208,
+   "block_ts": "2026-11-03T00:00:00.137Z",
+   "balances": {
+    "zec.omft.near": "3002310199694",
+    "qtc.omft.near": "92360177808812941",
+    "prl.omft.near": "11500337253631",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10588250648746897704436696",
+    "wrap.near": "16444931989236462012751236715794",
+    "nbtc.bridge.near": "14937886019",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3608759463935",
+    "token.rhealab.near": "14441075868678271938078043"
+   }
+  },
+  {
+   "date": "2026-11-04",
+   "block": 222942364,
+   "block_ts": "2026-11-04T00:00:00.279Z",
+   "balances": {
+    "wrap.near": "16595831527095886214240729112346",
+    "zec.omft.near": "2982772301628",
+    "nbtc.bridge.near": "14808582378",
+    "qtc.omft.near": "90966059867489179",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "2912626476168",
+    "prl.omft.near": "11963453580061",
+    "token.rhealab.near": "14417007283001446710883326",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10527461922015733840404069"
+   }
+  },
+  {
+   "date": "2026-11-05",
+   "block": 223088016,
+   "block_ts": "2026-11-05T00:00:00.524Z",
+   "balances": {
+    "wrap.near": "16566224290641198141263924754130",
+    "zec.omft.near": "3059224150647",
+    "nbtc.bridge.near": "18139869649",
+    "qtc.omft.near": "93396378783084338",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3970821312061",
+    "prl.omft.near": "22389694492015",
+    "token.rhealab.near": "14571646262874750508738120",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9722918037509251745079455"
+   }
+  },
+  {
+   "date": "2026-11-06",
+   "block": 223237989,
+   "block_ts": "2026-11-06T00:00:00.507Z",
+   "balances": {
+    "wrap.near": "16761794416724371572245706132868",
+    "zec.omft.near": "2823546029691",
+    "nbtc.bridge.near": "16139363421",
+    "qtc.omft.near": "90643355827975602",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3487925855290",
+    "prl.omft.near": "23074874830303",
+    "token.rhealab.near": "14481049574655053437504643",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9901232160272137695686661"
+   }
+  },
+  {
+   "date": "2026-11-07",
+   "block": 223387847,
+   "block_ts": "2026-11-07T00:00:00.214Z",
+   "balances": {
+    "wrap.near": "16896525187324820784872438518694",
+    "zec.omft.near": "2430056596643",
+    "nbtc.bridge.near": "15317023563",
+    "qtc.omft.near": "90591772580510372",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3262351664748",
+    "prl.omft.near": "43462043688707",
+    "token.rhealab.near": "14482315140996078120320510",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9900240571396266170406834"
+   }
+  },
+  {
+   "date": "2026-11-08",
+   "block": 223537267,
+   "block_ts": "2026-11-08T00:00:00.499Z",
+   "balances": {
+    "wrap.near": "17099257122133606925967421047090",
+    "zec.omft.near": "2641976801729",
+    "nbtc.bridge.near": "15322720973",
+    "qtc.omft.near": "90259190860994147",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3203578796849",
+    "prl.omft.near": "65635041133134",
+    "token.rhealab.near": "13953165188093490810764208",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9894609249039162962747769"
+   }
+  },
+  {
+   "date": "2026-11-09",
+   "block": 223688383,
+   "block_ts": "2026-11-09T00:00:00.359Z",
+   "balances": {
+    "wrap.near": "17077243725740297803948550151917",
+    "zec.omft.near": "2760175779980",
+    "nbtc.bridge.near": "15580112152",
+    "qtc.omft.near": "90084714575689971",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3059732520524",
+    "prl.omft.near": "88808314319073",
+    "token.rhealab.near": "13938313016677650246791567",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9914537364334056817525341"
+   }
+  },
+  {
+   "date": "2026-11-12",
+   "block": 224135610,
+   "block_ts": "2026-11-12T00:00:00.223Z",
+   "balances": {
+    "wrap.near": "17082428188630640688377396521208",
+    "zec.omft.near": "2672648419879",
+    "nbtc.bridge.near": "14185344906",
+    "qtc.omft.near": "90501512239374302",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "2933297115115",
+    "prl.omft.near": "98280119853974",
+    "token.rhealab.near": "13870847323127561571018448",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "9793479164238368530870623"
+   }
+  },
+  {
+   "date": "2026-11-13",
+   "block": 224285093,
+   "block_ts": "2026-11-13T00:00:00.521Z",
+   "balances": {
+    "wrap.near": "17661052127639961366884356816001",
+    "zec.omft.near": "2503060531184",
+    "nbtc.bridge.near": "15315373159",
+    "qtc.omft.near": "89620744782906104",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1": "3118757517192",
+    "prl.omft.near": "107903878336634",
+    "token.rhealab.near": "13807307321793642292873871",
+    "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": "10012278215841095169476405"
+   }
+  }
+ ]
+}
