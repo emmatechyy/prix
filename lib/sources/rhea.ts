@@ -43,6 +43,8 @@ export const rheaUrls = {
   volumeVariation: `${RHEA_DATA}/24h_volume_variation`,
   historicalTvl: (days: number) => `${RHEA_DATA}/historical_tvl?period=${days}`,
   poolDetail: (id: string) => `${RHEA_API}/pool/detail?pool_id=${encodeURIComponent(id)}`,
+  findPathBase: `${RHEA_ROUTER}/findPath`,
+  poolVolumeBase: `${RHEA_DATA}/pool/<id>/volume`,
   priceHistory: (ids: string[]) => `${RHEA_API}/list-history-token-price-by-ids?ids=${ids.map(encodeURIComponent).join("|")}`,
 };
 

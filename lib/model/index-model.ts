@@ -8,6 +8,9 @@ import { units } from "../format";
 import { getMarket, tokenLiquidity, type Market, type TokenLiquidity } from "./market";
 import { isCustody, isStable } from "./registry";
 import { flowStats, sampleSwaps, type FlowStats } from "./flows";
+import { applyIndexRules } from "./index-rules";
+import { loadThresholds } from "../thresholds/load";
+import { latestSnapshot } from "../snapshot/io";
 
 export const WEIGHTS = { depth: 0.3, activity: 0.25, distribution: 0.2, flow: 0.25 } as const;
 export type Pillar = keyof typeof WEIGHTS;
@@ -38,6 +41,8 @@ export type IndexRow = {
   confidence: number;
   flags: string[];
   rank: number | null;
+  /** thresholds index_rules: high/low confidence, with reasons (see lib/model/index-rules.ts). */
+  rules: { confidence: "high" | "low"; reasons: string[]; bestImpact10k: number | null; bestRoute: string | null };
 };
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
@@ -250,6 +255,7 @@ async function buildRow(m: Market, tl: TokenLiquidity, change24h: number | null)
     confidence,
     flags,
     rank: null,
+    rules: { confidence: "low", reasons: [], bestImpact10k: impact, bestRoute: null },
   };
 }
 
@@ -269,9 +275,31 @@ export const getIndex = memo(async (): Promise<IndexResult> => {
       return buildRow(m, x, ch);
     })
   ).filter((r): r is IndexRow => !!r);
-  const ranked = rows.filter((r) => r.score != null).sort((a, b) => b.score! - a.score!);
-  ranked.forEach((r, i) => (r.rank = i + 1));
-  const unranked = rows.filter((r) => r.score == null);
+  // Universe rules from thresholds/v1.yaml. Intents depth comes from the latest published snapshot
+  // (1Click dry quotes are run by the daily job, not on page load).
+  const extra = new Map<string, { impact: number; route: string }>();
+  let rules = { min_liquidity_usd: UNIVERSE_MIN_LIQUIDITY, max_price_impact_10k: 0.1 };
+  try {
+    rules = loadThresholds().t.index_rules;
+    for (const d of latestSnapshot()?.depth ?? []) {
+      if (d.route !== "intents" || d.size_usd !== DEPTH_TRADE_USD || d.status !== "ok" || d.relative_slippage == null) continue;
+      const cur = extra.get(d.token_id);
+      if (!cur || d.relative_slippage < cur.impact) extra.set(d.token_id, { impact: d.relative_slippage, route: `NEAR Intents (1Click dry quote from ${d.origin}, snapshot ${d.fetched_at.slice(0, 10)})` });
+    }
+  } catch {
+    /* no thresholds/snapshot available: rules fall back to the published defaults above */
+  }
+  const applied = applyIndexRules(
+    rows.map((r) => ({ id: r.id, score: r.score, liquidity: r.liquidity, impact10k: r.depth.impact, impactRoute: r.depth.method === "router" ? "RHEA Smart Router" : r.depth.method === "amm-reserves" ? "RHEA AMM reserve math" : null, derivedDepth: r.depth.method === "amm-reserves" })),
+    rules,
+    extra,
+  );
+  applied.forEach((a, i) => {
+    rows[i].rank = a.rank;
+    rows[i].rules = { confidence: a.confidence, reasons: a.reasons, bestImpact10k: a.bestImpact10k, bestRoute: a.bestRoute };
+  });
+  const ranked = rows.filter((r) => r.rank != null).sort((a, b) => a.rank! - b.rank!);
+  const unranked = rows.filter((r) => r.rank == null);
   return { asOf: new Date().toISOString(), rows: [...ranked, ...unranked], universe: liq.length, market: m };
 });
 
