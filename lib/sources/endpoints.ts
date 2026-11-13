@@ -12,3 +12,4 @@ export const AMM_CONTRACT = "v2.ref-finance.near";
 export const INTENTS_CONTRACT = "intents.near";
 export const USDC = "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1";
 export const WNEAR = "wrap.near";
+export const ARCHIVAL_RPC = process.env.NEAR_ARCHIVAL_RPC_URL ?? "https://archival-rpc.mainnet.fastnear.com";

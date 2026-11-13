@@ -1,0 +1,44 @@
+name: daily snapshot
+# Builds data/snapshots/YYYY-MM-DD.json from public sources and commits it.
+# Read-only: no wallet, no signing. Optional keys are repository secrets, used server-side only.
+on:
+  schedule:
+    - cron: "20 0 * * *" # 00:20 UTC daily
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: prix-data
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:thresholds
+      - run: pnpm flows --max-calls 20
+        env:
+          NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
+      - run: pnpm snapshot:daily
+        env:
+          NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
+          ONECLICK_API_KEY: ${{ secrets.ONECLICK_API_KEY }}
+          ONECLICK_JWT: ${{ secrets.ONECLICK_JWT }}
+          RHEA_AGGREGATOR_API_KEY: ${{ secrets.RHEA_AGGREGATOR_API_KEY }}
+      - run: pnpm verdicts
+      - name: commit
+        run: |
+          git config user.name "prix-data[bot]"
+          git config user.email "prix-data@users.noreply.github.com"
+          git add data/snapshots data/history
+          git diff --cached --quiet && exit 0
+          git commit -m "data: snapshot $(date -u +%F)"
+          git pull --rebase --autostash
+          git push

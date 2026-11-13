@@ -1,0 +1,36 @@
+name: intents flow buckets
+# Samples one page of NEAR Intents events every 30 minutes into data/history/intents-flow-buckets.json.
+# data/history changes do not trigger a Vercel deploy (vercel.json ignoreCommand).
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: prix-data
+  cancel-in-progress: false
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm flows --max-calls 6
+        env:
+          NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
+      - name: commit
+        run: |
+          git config user.name "prix-data[bot]"
+          git config user.email "prix-data@users.noreply.github.com"
+          git add data/history
+          git diff --cached --quiet && exit 0
+          git commit -m "data: flow bucket $(date -u +%FT%H:%MZ)"
+          git pull --rebase --autostash
+          git push

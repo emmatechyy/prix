@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Published snapshots and the thresholds file are read from disk at runtime.
+  outputFileTracingIncludes: { "/**": ["./data/snapshots/*.json", "./thresholds/*.yaml"] },
   turbopack: {
     rules: {
       "*.css": {
