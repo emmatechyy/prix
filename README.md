@@ -4,7 +4,7 @@ PRIX is a read-only analytics app for NEAR's on-chain markets. It reads pools fr
 
 - rejects liquidity it cannot verify;
 - ranks NEAR tokens on **depth, real activity, holder distribution and flows**;
-- tests five falsifiable investment claims about NEAR against live data.
+- tests six pre-registered, falsifiable investment claims about NEAR against published, hashed daily snapshots.
 
 Every number links to its source. A missing input is shown as "not reported", never estimated.
 
@@ -19,18 +19,32 @@ Built for **NEAR HACKATHON 2026**, track **Investment Thesis** (`thesis`).
 Holding a NEAR token means answering four questions. Can I exit without moving the price? Is the volume real? Who owns the supply? Is capital coming in or leaving? The raw data exists, but it is scattered, and much of it is misleading. For example, on 13 Nov 2026 a single RHEA pool reported about $683M of TVL, more than 10× the whole protocol. PRIX recomputes everything from reserves. It discards what fails integrity rules and shows its inputs, so an analyst can defend a position with evidence rather than conviction.
 
 
+## Re-run this in 3 commands
+
+```bash
+pnpm install --frozen-lockfile
+pnpm verdicts      # offline: verdicts H1–H6 from the latest data/snapshots/*.json (checks its sha256)
+pnpm verify        # online: refetch every source, rebuild in memory, diff against the published snapshot → PASS or the diff
+```
+
+`pnpm verdicts --snapshot data/snapshots/2026-11-13.json` pins a specific file. `pnpm verify --offline` skips the
+refetch; `--tolerance 0.10` (point-in-time values) and `--history-tolerance 0.01` (days before the snapshot) set the
+allowed drift; `--allow-verdict-drift` reports but does not fail on a changed verdict. Thresholds come from
+`thresholds/v1.yaml` (**DRAFT, not locked**, see `docs/threshold-diff.md`).
+
 ## Try it (judge walkthrough)
 
 Run it locally with the steps below, or use the hosted URL once it is deployed.
 
-1. **Open `/`** to see the market pulse: NEAR price, RHEA *clean* TVL with the count of rejected pools, NEAR Intents custody, active accounts, the top of the PRIX Index, and the five-claim thesis scorecard.
+1. **Open `/`** for the one-sentence thesis and its three pillars (usage, capital, markets) linked to the six claims, the market pulse, the top of the PRIX Index (high-confidence tokens only), TVL with and without the rejected pools, and the six-claim scorecard.
 2. **Open `/rankings`** for every token in the universe with its composite score, four pillar scores, confidence, $10k price impact, top-10 holder share of float, buy pressure and flags.
 3. **Click any token** (for example RHEA). Each pillar lists its exact inputs with a `src ↗` link to the API call that produced it. You also get the pool's 90-day TVL and volume chart, its top holders (custody contracts are labelled), and every RHEA pool containing the token, including the ones PRIX rejected and why.
-4. **Open `/thesis`** to see the five claims, each with an evidence table (for, against, context), the fixed decision rule, the computed verdict, and the condition that would change it.
+4. **Open `/thesis`** to see the six pre-registered claims: verdict, metric vs threshold, margin to the next verdict, evidence grade, window, sample size, flip condition and snapshot hashes, plus a before/after panel around the 2026-10-01 NEAR Intents exploit.
+4b. **Open `/depth`** for the depth matrix: 1Click dry-run quotes (BTC/ETH/SOL → token) and RHEA router quotes (token → USDC) at $1k/$10k/$100k/$1M, with every failed, paused or rate-limited quote shown.
 5. **Open `/whales`** to see swaps and liquidity moves of $10k or more, each traced to its transaction and signer on nearblocks.io.
-6. **Open `/flows`** for sector liquidity, per-token buy and sell pressure, NEAR Intents deposits and withdrawals by asset and origin chain, and the assets held by `intents.near`.
+6. **Open `/flows`** for sampled NEAR Intents flows over 24h/7d/30d with event counts, sector liquidity, per-token buy and sell pressure, NEAR Intents deposits and withdrawals by asset and origin chain, and the assets held by `intents.near`.
 7. **Open `/launches`** for new tokens from the newest RHEA pools, scored on liquidity, distribution, activity and age, with the creator account.
-8. **Run `pnpm snapshot`**. It re-runs every model from raw public data and writes `data/snapshots/prix-<UTC>.json`, then prints the five verdicts.
+8. **Run `pnpm verdicts` and `pnpm verify`** (above).
 9. **Call the API**: `curl localhost:3000/api/v1/index | jq '.rows[0]'`.
 
 ## How NEAR is used
@@ -78,7 +92,10 @@ All sources are public and need no key. They were verified on 13 Nov 2026.
 | `api.nearblocks.io/v3` | network history, receipt → tx → signer, account creation, Intents events |
 | `1click.chaindefuser.com/v0/tokens` | independent price cross-check |
 
-PRIX does not use the NEAR Intents Explorer API, which needs a partner JWT, or the RHEA cross-chain quote API, which needs a key. Both are on the roadmap.
+- **NEAR Intents 1Click quotes**: `POST /v0/quote` with `dry: true` (no deposit address is returned, nothing can be sent) measures what BTC/ETH/SOL → token orders would cost at four sizes.
+- **Archival RPC**: `ft_balance_of(intents.near)` at the first block of each UTC day since 2026-09-19 for the H6 recovery test.
+
+The RHEA aggregator V2 (`@rhea-finance/cross-chain-aggregation-dex` `SwapClient`) needs a JWT from boss.rhea.finance; set `RHEA_AGGREGATOR_API_KEY` to enable it. See `docs/sdk-notes.md`.
 
 ## Setup
 
@@ -88,7 +105,9 @@ Requires Node 20.9+ and pnpm.
 pnpm install
 cp .env.example .env.local   # optional: every variable is optional
 pnpm build && pnpm start     # http://localhost:3000
-pnpm snapshot                # reproducible JSON snapshot + thesis verdicts
+pnpm test                    # vitest: engine fixtures, depth math, thresholds, hashing
+pnpm snapshot:daily          # build data/snapshots/<UTC date>.json (what the daily GitHub Action runs)
+pnpm flows                   # sample NEAR Intents flow buckets into data/history/
 ```
 
 The first build pre-renders every page from live data, which takes about 1 minute on a cold cache. Pages then revalidate every 5–10 minutes.
@@ -98,6 +117,9 @@ The first build pre-renders every page from live data, which takes about 1 minut
 | Variable | Purpose |
 |---|---|
 | `NEARBLOCKS_API_KEY` | Raises NearBlocks rate limits. Recommended for a hosted demo, since the free tier can return 429 under load. Any section that hits the limit shows "not reported" |
+| `ONECLICK_API_KEY` / `ONECLICK_JWT` | 1Click partner key (X-API-Key) or legacy JWT (Bearer) from partners.near-intents.org. Removes the 20 bps unauthenticated fee and raises limits; dry quotes work without it |
+| `RHEA_AGGREGATOR_API_KEY` | RHEA aggregator V2 JWT from boss.rhea.finance (not wired until verified; reported as not configured) |
+| `NEAR_ARCHIVAL_RPC_URL` | Archival RPC override (default archival-rpc.mainnet.fastnear.com) |
 | `NEAR_RPC_URL`, `RHEA_INDEXER_URL`, `RHEA_DATA_SERVICE_URL`, `RHEA_SMART_ROUTER_URL`, `NEARBLOCKS_API_URL`, `FASTNEAR_API_URL`, `ONECLICK_API_URL` | Endpoint overrides |
 
 No database is required.
@@ -106,7 +128,7 @@ No database is required.
 
 1. Import the repo into a Vercel project (framework: Next.js; defaults are fine).
 2. Optionally add `NEARBLOCKS_API_KEY` as a Sensitive environment variable for Production.
-3. Deploy. No database, cron or other integrations are needed.
+3. Deploy. No database is needed. Snapshots are committed to `data/snapshots/` by the `daily snapshot` GitHub Action (00:20 UTC); the `intents flow buckets` Action samples flows every 30 minutes into `data/history/` (these commits skip the Vercel build via `vercel.json`'s `ignoreCommand`).
 
 ## Public API
 
@@ -117,7 +139,15 @@ No database is required.
 | `GET /api/v1/flows` | sector liquidity, token pressure, Intents flows and custody |
 | `GET /api/v1/whales` | whale swaps, LP moves, accounts |
 | `GET /api/v1/launches` | launch radar |
-| `GET /api/v1/thesis` | hypotheses, rules, evidence, verdicts |
+| `GET /api/v1/thesis` | verdicts H1–H6 from the latest snapshot (envelope) |
+| `GET /api/v1/depth?token=&size=` | depth matrix rows (envelope) |
+| `GET /api/v1/integrity` | TVL with and without rejected pools (envelope) |
+| `GET /api/v1/history?claim=H1` | one claim across all snapshots + its series (envelope) |
+| `GET /api/v1/snapshots`, `/api/v1/snapshots/{date}` | published snapshot files |
+| `GET /api/v1/openapi.json` | OpenAPI 3.1 |
+| `GET /feed.xml` | Atom feed: one entry per verdict change |
+
+Envelope: `{as_of, methodology_version, thresholds_version, thresholds_status, source_hash, data}`; `source_hash` is the snapshot file's `sha256`.
 
 ## Design system
 
@@ -142,8 +172,16 @@ The UI follows a light editorial design language (a Framer portfolio template wa
 app/                 pages (App Router) and /api/v1 routes
 components/          UI primitives, Lightweight Charts wrapper, navigation
 lib/sources/         typed clients for RHEA, NEAR RPC, FastNEAR, NearBlocks v3, 1Click
-lib/model/           deterministic models: market+integrity, index, flows, whales, launches, network, thesis
-scripts/snapshot.mts reproducible snapshot CLI
+lib/model/           deterministic live models: market+integrity, index (+ thresholds rules), flows, whales, launches, network
+lib/thresholds/      thresholds/v1.yaml schema (zod), rule compiler
+lib/thesis/          pure verdict engine H1–H6 + statistics
+lib/depth/           1Click dry-quote matrix, RHEA router depth, slippage maths
+lib/snapshot/        snapshot schema, canonical hash, builder, file IO
+lib/history/         archival custody and sampled flow-bucket histories (data/history)
+scripts/             snapshot-daily, flows-sample, verdicts, verify, check-thresholds
+thresholds/v1.yaml   pre-registered thresholds (DRAFT)
+data/snapshots/      published daily snapshots
+tests/               vitest
 docs/PRD.md          full product requirements and methodology
 screenshots/         380px and 1280px captures of every page
 ```

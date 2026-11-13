@@ -59,7 +59,7 @@ export async function updateFlowBuckets({ days = 31, stepHours = 3, nowMs = Date
   const step = stepHours * 3600000;
   const gridEnd = Math.floor(nowMs / step) * step;
   for (let t = gridEnd; t > nowMs - days * 86400000; t -= step) if (!have(t)) slots.push(t);
-  let calls = 0, ok = 0;
+  let calls = 0, ok = 0, filled = 0;
   const tryOnce = async (t?: number) => {
     for (let attempt = 0; attempt < 4; attempt++) {
       try {
@@ -82,6 +82,7 @@ export async function updateFlowBuckets({ days = 31, stepHours = 3, nowMs = Date
     if (calls >= maxCalls) break;
     try {
       const b = await tryOnce(t);
+      if (b) filled++;
       if (b) {
         h.buckets.push(b);
         ok++;
@@ -93,6 +94,6 @@ export async function updateFlowBuckets({ days = 31, stepHours = 3, nowMs = Date
   }
   h.buckets.sort((a, b) => a.end.localeCompare(b.end));
   writeHistory(FLOWS_FILE, h);
-  log(`flow buckets: +${ok} (${calls} calls), total ${h.buckets.length}, ${slots.length - ok} slots still empty`);
+  log(`flow buckets: +${ok} (${calls} calls), total ${h.buckets.length}, ${slots.length - filled} grid slots still empty`);
   return h;
 }
