@@ -259,7 +259,7 @@ async function buildRow(m: Market, tl: TokenLiquidity, change24h: number | null)
   };
 }
 
-export type IndexResult = { asOf: string; rows: IndexRow[]; universe: number; market: Market };
+export type IndexResult = { asOf: string; rows: IndexRow[]; universe: number; market: Market; rules: { min_liquidity_usd: number; max_price_impact_10k: number } };
 
 export const getIndex = memo(async (): Promise<IndexResult> => {
   const m = await getMarket();
@@ -300,7 +300,7 @@ export const getIndex = memo(async (): Promise<IndexResult> => {
   });
   const ranked = rows.filter((r) => r.rank != null).sort((a, b) => a.rank! - b.rank!);
   const unranked = rows.filter((r) => r.rank == null);
-  return { asOf: new Date().toISOString(), rows: [...ranked, ...unranked], universe: liq.length, market: m };
+  return { asOf: new Date().toISOString(), rows: [...ranked, ...unranked], universe: liq.length, market: m, rules: { min_liquidity_usd: rules.min_liquidity_usd, max_price_impact_10k: rules.max_price_impact_10k } };
 });
 
 /** Full evidence row for one token: from the index if it is in the universe, otherwise computed on demand. */

@@ -4,6 +4,8 @@ import { DEPTH_TRADE_USD, UNIVERSE_MAX, UNIVERSE_MIN_LIQUIDITY, WEIGHTS } from "
 import { LAUNCH_WEIGHTS } from "@/lib/model/launches";
 import { WHALE_USD } from "@/lib/model/whales";
 import { CUSTODY_ACCOUNTS } from "@/lib/model/registry";
+import { getPublished } from "@/lib/server/published";
+import { ThresholdsBadge } from "@/components/snapshot-ui";
 
 export const metadata: Metadata = { title: "Methodology" };
 
@@ -23,16 +25,65 @@ const SOURCES: [string, string, string][] = [
   ["NEAR RPC (FastNEAR free)", "https://free.rpc.fastnear.com", "dclv2.ref-labs.near list_pools (DCL reserves), ft_total_supply per token"],
   ["FastNEAR API", "https://api.fastnear.com", "Top 100 holders per token; token balances of intents.near"],
   ["NearBlocks API v3", "https://api.nearblocks.io/v3", "Daily txns/active accounts/price; receipt → transaction → signer; account creation; NEAR Intents MINT/BURN events"],
-  ["NEAR Intents 1Click", "https://1click.chaindefuser.com/v0/tokens", "Independent price for cross-checking RHEA prices"],
+  ["NEAR Intents 1Click", "https://1click.chaindefuser.com/v0/tokens", "Independent price for cross-checking RHEA prices; sizing of the BTC/ETH/SOL quote legs"],
+  ["NEAR Intents 1Click quotes", "https://1click.chaindefuser.com/docs/v0/openapi.yaml", "POST /v0/quote with dry:true for the depth matrix. Dry quotes carry no deposit address; nothing is ever sent."],
+  ["NEAR archival RPC (FastNEAR)", "https://archival-rpc.mainnet.fastnear.com", "ft_balance_of(intents.near) at the first block of each UTC day since 2026-09-19 (H6 custody quantity index)"],
+  ["NearBlocks intents.near stats", "https://api.nearblocks.io/v3/accounts/intents.near/stats/txns", "Daily intents.near transactions (H6)"],
+  ["Incident reporting", "https://www.theblock.co/news/ecosystems/2026-10-01-near-intents-halts-services-after-3-8-million-exploit-promises-full-compensation-417404", "The 2026-10-01 NEAR Intents exploit date (also CoinDesk, 2026-10-01)"],
 ];
 
 export default function Methodology() {
+  const { thresholds: th, snapshot } = getPublished();
   return (
     <>
       <PageHeader eyebrow="Methodology" title="How every PRIX number is produced">
         PRIX is deterministic: the same upstream data gives the same scores. No language model writes a number or a verdict. Labels below (sectors, custody accounts) are curated by hand and listed in full so they can be challenged.
       </PageHeader>
       <div className="grid gap-4 xl:grid-cols-2">
+        <Section id="thresholds" title="0. Pre-registered thresholds" wide>
+          <p className="flex flex-wrap items-center gap-2">
+            <ThresholdsBadge version={th.t.version} locked={th.locked} />
+            <span>
+              File <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/integration/thresholds/v1.yaml" target="_blank" rel="noreferrer"><code>thresholds/v1.yaml</code></a> · sha256 <code>{th.sha256.slice(0, 16)}…</code> · lock commit:{" "}
+              {th.locked ? <code>{th.t.locked_at_commit}</code> : <strong>not set (DRAFT)</strong>}
+            </span>
+          </p>
+          <p>
+            Every verdict threshold lives in one YAML file that is validated with zod at build time; the build fails if it does not parse. Once a human sets <code>locked_at_commit</code> to the commit that introduced it, any change becomes <code>v2.yaml</code> and old and new verdicts are shown side by side. Until then every verdict on this site is labelled <strong>DRAFT, not locked</strong>. Differences from PRIX&apos;s earlier rules are listed in <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/integration/docs/threshold-diff.md" target="_blank" rel="noreferrer">docs/threshold-diff.md</a>.
+          </p>
+          <div className="scroll-x -mx-5 sm:-mx-6">
+            <table className="data">
+              <thead><tr><th>Claim</th><th>Metric</th><th>Supported</th><th>Not supported</th><th>Grade</th></tr></thead>
+              <tbody>
+                {Object.entries(th.t.claims).map(([id, c]) => (
+                  <tr key={id}>
+                    <td className="num text-ink">{id}</td>
+                    <td className="min-w-[260px] whitespace-normal">{c.metric.replace(/\s+/g, " ")}</td>
+                    <td className="min-w-[180px] whitespace-normal"><code>{c.supported}</code></td>
+                    <td className="min-w-[160px] whitespace-normal"><code>{c.not_supported}</code></td>
+                    <td>{c.grade}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Global: no verdict from a window under <strong>{th.t.global.min_window_days} days</strong> (H3 depth is point-in-time and exempt; see the diff) and Intents-flow claims need at least <strong>{th.t.global.min_intents_events.toLocaleString("en-US")} sampled events</strong>, otherwise “Insufficient data”. Index universe: clean liquidity ≥ ${th.t.index_rules.min_liquidity_usd.toLocaleString("en-US")} and best measured $10k impact ≤ {(th.t.index_rules.max_price_impact_10k * 100).toFixed(0)}%; tokens failing either are shown with a low-confidence badge and excluded from the top-ranked view.
+          </p>
+          <p>
+            <strong>Evidence grades.</strong> A = {th.t.global.evidence_grades.A}; B = {th.t.global.evidence_grades.B}; C = {th.t.global.evidence_grades.C}. H3 drops to C when a passing token&apos;s depth comes only from AMM reserve math.
+          </p>
+          <p>
+            <strong>Snapshots.</strong> A GitHub Action builds <code>data/snapshots/YYYY-MM-DD.json</code> once a day and commits it; its <code>sha256</code> is the hash of the canonical JSON (sorted keys) of everything else in the file. Every API response carries it as <code>source_hash</code>. Latest: {snapshot ? <a className="underline underline-offset-4 hover:text-text" href={`/api/v1/snapshots/${snapshot.date}`}><code>{snapshot.date}</code> · <code>{snapshot.sha256.slice(0, 16)}…</code></a> : "none"}. Re-run: <code>pnpm verdicts</code> (offline) and <code>pnpm verify</code> (refetch and diff).
+          </p>
+        </Section>
+
+        <Section id="neutrality" title="Neutrality note" wide>
+          <p>
+            <strong>RHEA is both a source and a subject.</strong> RHEA&apos;s indexer, data service and Smart Router supply most of PRIX&apos;s pool, price and depth data, and RHEA&apos;s own token is ranked in the index and its markets are judged in H3 and H4. PRIX does not take RHEA&apos;s totals on trust: pool values are recomputed from reserves, pools that fail the integrity rules are excluded (and the excluded amount is published), RHEA prices are cross-checked against NEAR Intents 1Click, and depth is measured on two independent routes (RHEA router and 1Click quotes) with the better one used. PRIX has no commercial relationship with RHEA or NEAR Intents; the build is for the NEAR Hackathon 2026 Investment Thesis track.
+          </p>
+        </Section>
+
         <Section id="sources" title="1. Data sources" wide>
           <div className="scroll-x -mx-5 sm:-mx-6">
             <table className="data">
@@ -101,9 +152,14 @@ export default function Methodology() {
             <li><code>GET /api/v1/flows</code> — sector liquidity, token pressure, Intents flows & custody</li>
             <li><code>GET /api/v1/whales</code> — whale swaps, LP moves, accounts</li>
             <li><code>GET /api/v1/launches</code> — launch radar</li>
-            <li><code>GET /api/v1/thesis</code> — hypotheses, rules, evidence, verdicts</li>
+            <li><code>GET /api/v1/thesis</code> — verdicts H1–H6 from the latest snapshot</li>
+            <li><code>GET /api/v1/depth?token=&amp;size=</code> — depth matrix rows</li>
+            <li><code>GET /api/v1/integrity</code> — TVL with and without rejected pools</li>
+            <li><code>GET /api/v1/history?claim=H1</code> — one claim across all snapshots</li>
+            <li><code>GET /api/v1/snapshots/&lt;date&gt;</code> — a published snapshot file</li>
+            <li><code>GET /api/v1/openapi.json</code> — OpenAPI 3.1 description · <code>/feed.xml</code> — Atom feed of verdict changes</li>
           </ul>
-          <p>Responses carry <code>asOf</code> and source URLs. Cached for 10 minutes.</p>
+          <p>Snapshot-backed responses use the envelope <code>{"{as_of, methodology_version, thresholds_version, source_hash, data}"}</code>; <code>source_hash</code> equals the snapshot file&apos;s <code>sha256</code>. The live legacy endpoints keep their fields. CORS is open; responses are cached for 10 minutes.</p>
         </Section>
 
         <Section id="limits" title="8. Known limits">
@@ -113,6 +169,11 @@ export default function Methodology() {
             <li>Pool TVL change is measured in USD and includes price moves.</li>
             <li>FastNEAR returns the top 100 holders; tokens with more are shown as “100+”.</li>
             <li>Holdings outside RHEA (other DEXs, CEXs) are not covered.</li>
+            <li>H2 needs 30 daily snapshots: there is no honest backfill of clean (integrity-filtered) RHEA TVL, so H2 reads “Insufficient data” until the window fills.</li>
+            <li>H5 net flow is a sample (one page of up to 100 events per slot), day-weighted and never extrapolated; it gives a direction, not a total.</li>
+            <li>H6 custody is a quantity index at today&apos;s prices for the largest assets that existed throughout the window; tokens launched after the incident are left out rather than counted as recovery.</li>
+            <li>The RHEA aggregator V2 route needs a key from boss.rhea.finance and is reported as not configured; V1 router quotes and AMM math are used instead.</li>
+            <li>1Click quotes without a partner key include a 20 bps app fee, identical at every size, so it cancels out of relative slippage.</li>
           </ul>
         </Section>
       </div>
