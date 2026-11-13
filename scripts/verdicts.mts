@@ -21,6 +21,7 @@ if (process.argv.includes("--json")) {
   process.stdout.write(JSON.stringify({ snapshot: file, sha256: snapshot.sha256, hash_ok: hashOk, thresholds: th.locked ? "locked" : "DRAFT, not locked", verdicts: v }, null, 1) + "\n");
 } else {
   console.log(`snapshot ${file} · sha256 ${snapshot.sha256.slice(0, 12)} ${hashOk ? "(hash OK)" : "(HASH MISMATCH)"} · thresholds v${th.t.version} ${th.locked ? "locked" : "DRAFT, not locked"}`);
-  for (const x of v) console.log(`${x.id}  ${x.verdict.padEnd(17)} ${x.metric_label}${x.insufficient_reason ? `  — ${x.insufficient_reason}` : ""}`);
+  const f = (n: number | null) => (n == null ? "not reported" : Math.abs(n) >= 1000 ? Math.round(n).toLocaleString("en-US") : String(Math.round(n * 1000) / 1000));
+  for (const x of v) console.log(`${x.id}  ${x.verdict.padEnd(17)} ${x.metric_label} = ${f(x.metric_value)} · grade ${x.evidence_grade} · ${x.window.from}→${x.window.to}${x.insufficient_reason ? `  — ${x.insufficient_reason}` : ""}`);
 }
 process.exit(hashOk ? 0 : 1);
