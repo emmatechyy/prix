@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PRIX: evidence-graded smart index layer for NEAR
 
-## Getting Started
+PRIX is a read-only analytics app for NEAR's on-chain markets. It reads pools from RHEA (formerly Ref Finance), NEAR Intents balances and flows, and NEAR network history. It then:
 
-First, run the development server:
+- rejects liquidity it cannot verify;
+- ranks NEAR tokens on **depth, real activity, holder distribution and flows**;
+- tests five falsifiable investment claims about NEAR against live data.
+
+Every number links to its source. A missing input is shown as "not reported", never estimated.
+
+Built for **NEAR HACKATHON 2026**, track **Investment Thesis** (`thesis`).
+
+> No wallet, no signing, no trading, no custody, no private keys. PRIX only reads public data.
+
+![Overview, 1280px](screenshots/overview-1280.png)
+
+## The problem it solves
+
+Holding a NEAR token means answering four questions. Can I exit without moving the price? Is the volume real? Who owns the supply? Is capital coming in or leaving? The raw data exists, but it is scattered, and much of it is misleading. For example, on 13 Nov 2026 a single RHEA pool reported about $683M of TVL, more than 10× the whole protocol. PRIX recomputes everything from reserves. It discards what fails integrity rules and shows its inputs, so an analyst can defend a position with evidence rather than conviction.
+
+## Try it (judge walkthrough)
+
+Run it locally with the steps below, or use the hosted URL once it is deployed.
+
+1. **Open `/`** to see the market pulse: NEAR price, RHEA *clean* TVL with the count of rejected pools, NEAR Intents custody, active accounts, the top of the PRIX Index, and the five-claim thesis scorecard.
+2. **Open `/rankings`** for every token in the universe with its composite score, four pillar scores, confidence, $10k price impact, top-10 holder share of float, buy pressure and flags.
+3. **Click any token** (for example RHEA). Each pillar lists its exact inputs with a `src ↗` link to the API call that produced it. You also get the pool's 90-day TVL and volume chart, its top holders (custody contracts are labelled), and every RHEA pool containing the token, including the ones PRIX rejected and why.
+4. **Open `/thesis`** to see the five claims, each with an evidence table (for, against, context), the fixed decision rule, the computed verdict, and the condition that would change it.
+5. **Open `/whales`** to see swaps and liquidity moves of $10k or more, each traced to its transaction and signer on nearblocks.io.
+6. **Open `/flows`** for sector liquidity, per-token buy and sell pressure, NEAR Intents deposits and withdrawals by asset and origin chain, and the assets held by `intents.near`.
+7. **Open `/launches`** for new tokens from the newest RHEA pools, scored on liquidity, distribution, activity and age, with the creator account.
+8. **Run `pnpm snapshot`**. It re-runs every model from raw public data and writes `data/snapshots/prix-<UTC>.json`, then prints the five verdicts.
+9. **Call the API**: `curl localhost:3000/api/v1/index | jq '.rows[0]'`.
+
+## How NEAR is used
+
+- **RHEA**: the AMM pool reserves, prices, swap and liquidity events and daily pool history come from the RHEA indexer and data service. DCL (concentrated-liquidity) pool reserves are read **directly from the `dclv2.ref-labs.near` contract** over NEAR RPC. Price impact comes from read-only **RHEA Smart Router** quotes.
+- **NEAR Intents**: PRIX reads the balances held by `intents.near` (FastNEAR) and the latest MINT/BURN events (deposits and withdrawals, from NearBlocks v3). It also uses the **1Click** token list as an independent price to cross-check RHEA prices.
+- **NEAR protocol**: `ft_total_supply` via RPC, top holders from FastNEAR, and daily transactions, active accounts and price from NearBlocks v3. Receipts are resolved to transactions and signers.
+
+## Methodology (summary)
+
+Full detail is on `/methodology` and in [docs/PRD.md](docs/PRD.md).
+
+**Integrity.** A pool is excluded when:
+- a side has no price;
+- a 50/50 AMM pool's sides differ by more than 3×;
+- it has no base asset (NEAR, stablecoin, liquid-staked NEAR, or a curated bridged major); or
+- it claims more than 50% of RHEA's total TVL.
+
+Pools under $1k are dust.
+
+**PRIX score** (0–100) is the weighted mean of the available pillars:
+
+| Pillar | Weight | Measure |
+|---|---|---|
+| Depth | 30% | Price impact plus fees of a $10k sell into USDC (RHEA Smart Router, or AMM math as a fallback). 0.3% scores 100 and 10% scores 0, on a log scale |
+| Activity | 25% | 24h clean volume, log-scaled from $1k to $100M. Capped at 50 for turnover above 5×/day or round trips above 30% |
+| Distribution | 20% | Share of float held by the top 10 non-custody holders. 20% scores 100 and 90% scores 0 |
+| Flow | 25% | Net buy pressure in the last 50 swaps, plus 7-day pool TVL change and 7-day vs 30-day volume |
+
+**Confidence** is the share of weight with data. Below 50%, a token is listed but not ranked.
+
+**Thesis rules** are in the table on `/thesis` and in the PRD §3.
+
+## Data sources
+
+All sources are public and need no key. They were verified on 13 Nov 2026.
+
+| Source | Used for |
+|---|---|
+| `api.rhea.finance` (RHEA indexer) | pools, prices, token metadata, swaps and liquidity events, DCL volume and TVL history |
+| `api.data-service.ref.finance/api` | protocol TVL history, per-pool daily TVL and volume |
+| `smartrouter.rhea.finance/findPath` | read-only route quotes for price impact |
+| `free.rpc.fastnear.com` (NEAR RPC) | `dclv2.ref-labs.near list_pools`, `ft_total_supply` |
+| `api.fastnear.com` | top holders, `intents.near` balances |
+| `api.nearblocks.io/v3` | network history, receipt → tx → signer, account creation, Intents events |
+| `1click.chaindefuser.com/v0/tokens` | independent price cross-check |
+
+PRIX does not use the NEAR Intents Explorer API, which needs a partner JWT, or the RHEA cross-chain quote API, which needs a key. Both are on the roadmap.
+
+## Setup
+
+Requires Node 20.9+ and pnpm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # optional: every variable is optional
+pnpm build && pnpm start     # http://localhost:3000
+pnpm snapshot                # reproducible JSON snapshot + thesis verdicts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The first build pre-renders every page from live data, which takes about 1 minute on a cold cache. Pages then revalidate every 5–10 minutes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables (all optional, server-side only)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+|---|---|
+| `NEARBLOCKS_API_KEY` | Raises NearBlocks rate limits. Recommended for a hosted demo, since the free tier can return 429 under load. Any section that hits the limit shows "not reported" |
+| `NEAR_RPC_URL`, `RHEA_INDEXER_URL`, `RHEA_DATA_SERVICE_URL`, `RHEA_SMART_ROUTER_URL`, `NEARBLOCKS_API_URL`, `FASTNEAR_API_URL`, `ONECLICK_API_URL` | Endpoint overrides |
 
-## Learn More
+No database is required.
 
-To learn more about Next.js, take a look at the following resources:
+### Deploy to Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Import the repo into a Vercel project (framework: Next.js; defaults are fine).
+2. Optionally add `NEARBLOCKS_API_KEY` as a Sensitive environment variable for Production.
+3. Deploy. No database, cron or other integrations are needed.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Public API
 
-## Deploy on Vercel
+| Endpoint | Returns |
+|---|---|
+| `GET /api/v1/index` | ranked index with every pillar input and source |
+| `GET /api/v1/token/{contract}` | one token's evidence row and pools |
+| `GET /api/v1/flows` | sector liquidity, token pressure, Intents flows and custody |
+| `GET /api/v1/whales` | whale swaps, LP moves, accounts |
+| `GET /api/v1/launches` | launch radar |
+| `GET /api/v1/thesis` | hypotheses, rules, evidence, verdicts |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/                 pages (App Router) and /api/v1 routes
+components/          UI primitives, Lightweight Charts wrapper, navigation
+lib/sources/         typed clients for RHEA, NEAR RPC, FastNEAR, NearBlocks v3, 1Click
+lib/model/           deterministic models: market+integrity, index, flows, whales, launches, network, thesis
+scripts/snapshot.mts reproducible snapshot CLI
+docs/PRD.md          full product requirements and methodology
+screenshots/         380px and 1280px captures of every page
+```
+
+## Known limits
+
+- Swap and Intents samples cover short, stated windows (minutes to hours). They describe the present, not a trend.
+- The RHEA indexer does not expose swap signers, so PRIX resolves them only for the largest events.
+- Pool TVL change is measured in USD and includes price moves.
+- FastNEAR returns up to 100 holders; larger holder bases show as "100+".
+- Venues other than RHEA and NEAR Intents are not covered.
+
+## Hackathon disclosure
+
+- Everything in this repository was written during NEAR HACKATHON 2026, starting 13 Nov 2026. There is no pre-hackathon baseline.
+- Libraries used: Next.js 16, React 19, Tailwind CSS 4, TradingView Lightweight Charts 5, Geist fonts, `server-only`, and tsx (dev, for the CLI). The code was written with AI assistance.
+- License: MIT (see [LICENSE](LICENSE)).
+
+## Screenshots
+
+| Page | 1280px | 380px |
+|---|---|---|
+| Overview | ![](screenshots/overview-1280.png) | ![](screenshots/overview-380.png) |
+| PRIX Index | ![](screenshots/index-1280.png) | ![](screenshots/index-380.png) |
+| Thesis | ![](screenshots/thesis-1280.png) | ![](screenshots/thesis-380.png) |
+| Flows | ![](screenshots/flows-1280.png) | ![](screenshots/flows-380.png) |
+| Whales | ![](screenshots/whales-1280.png) | ![](screenshots/whales-380.png) |
+| Launch radar | ![](screenshots/launches-1280.png) | ![](screenshots/launches-380.png) |
+| Token detail (RHEA) | ![](screenshots/token-rhea-1280.png) | ![](screenshots/token-rhea-380.png) |
+| Methodology | ![](screenshots/methodology-1280.png) | ![](screenshots/methodology-380.png) |

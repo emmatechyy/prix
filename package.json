@@ -6,12 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "snapshot": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/snapshot.mts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "geist": "^1.9.2",
+    "lightweight-charts": "^5.3.0",
     "next": "16.4.6",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
@@ -21,7 +26,13 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.34.9"
+  "packageManager": "pnpm@10.34.9",
+  "description": "PRIX \u2014 evidence-graded smart index layer for NEAR on-chain markets (read-only).",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.9"
+  }
 }
