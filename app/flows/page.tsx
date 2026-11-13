@@ -10,6 +10,7 @@ import Link from "next/link";
 import { getPublished } from "@/lib/server/published";
 import { Provenance } from "@/components/snapshot-ui";
 import type { Snapshot } from "@/lib/snapshot/schema";
+import { getLending, LENDING_SOURCE } from "@/lib/rhea/lending";
 
 export const metadata: Metadata = { title: "Liquidity flows" };
 
@@ -26,6 +27,7 @@ export default async function Flows({ searchParams }: { searchParams: Promise<{ 
   const q = (await searchParams).w;
   const w: W = q === "24h" || q === "30d" ? q : "7d";
   const pub = getPublished();
+  const lending = await safe(getLending);
   const [idx, flows, custody] = await Promise.all([safe(getIndex), safe(getIntentsFlows), safe(getIntentsCustody)]);
   const sectors = idx.ok ? sectorBreakdown(idx.v.market) : null;
   const tokenFlows = idx.ok ? idx.v.rows.filter((r) => r.flow && r.flow.count > 0).sort((a, b) => Math.abs(b.flow!.netUsd) - Math.abs(a.flow!.netUsd)) : [];
@@ -155,6 +157,31 @@ export default async function Flows({ searchParams }: { searchParams: Promise<{ 
             <div className="px-5 pb-5 sm:px-6"><SourceError what="Intents balances" error={custody.e} /></div>
           )}
           <Sources urls={custody.ok ? [custody.v.source, "https://api.rhea.finance/list-token-price"] : []} />
+        </Card>
+        <Card>
+          <CardHeader title="Fundamentals: RHEA Lending" subtitle="Supplied and borrowed balances per asset on RHEA Lending (Burrow), read with the RHEA cross-chain SDK's read-only batchViews(). Utilization = borrowed ÷ supplied. APRs are as reported by the contract. USD at RHEA prices; unpriced assets show not reported." right={lending.ok ? `${usd(lending.v.supplied_usd)} supplied · ${usd(lending.v.borrowed_usd)} borrowed` : undefined} />
+          {lending.ok ? (
+            <div className="scroll-x">
+              <table className="data">
+                <thead><tr><th>Asset</th><th className="r">Supplied</th><th className="r">Borrowed</th><th className="r">Utilization</th><th className="r">Supply APR</th><th className="r">Borrow APR</th></tr></thead>
+                <tbody>
+                  {lending.v.rows.filter((r) => (r.supplied_usd ?? 0) >= 1000 || r.supplied_usd == null).slice(0, 14).map((r) => (
+                    <tr key={r.token_id}>
+                      <td><TokenLink id={r.token_id} symbol={r.symbol} /></td>
+                      <td className="r num">{r.supplied_usd == null ? <span className="text-faint">not reported</span> : usd(r.supplied_usd)}</td>
+                      <td className="r num">{r.borrowed_usd == null ? <span className="text-faint">not reported</span> : usd(r.borrowed_usd)}</td>
+                      <td className="r num">{r.utilization == null ? <span className="text-faint">not reported</span> : pct(r.utilization, 1)}</td>
+                      <td className="r num">{r.supply_apr == null ? <span className="text-faint">not reported</span> : pct(r.supply_apr, 2)}</td>
+                      <td className="r num">{r.borrow_apr == null || !r.can_borrow ? <span className="text-faint">{r.can_borrow ? "not reported" : "not borrowable"}</span> : pct(r.borrow_apr, 2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="px-5 pb-5 sm:px-6"><SourceError what="RHEA Lending" error={lending.e} /></div>
+          )}
+          <Sources urls={["https://nearblocks.io/address/contract.main.burrow.near", "https://www.npmjs.com/package/@rhea-finance/cross-chain-sdk"]} note={LENDING_SOURCE} />
         </Card>
       </div>
     </>
