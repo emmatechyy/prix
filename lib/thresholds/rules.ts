@@ -49,8 +49,8 @@ export function compileRules(t: Thresholds) {
     H1: { maDays: h1Ma, windowDays: h1Days, maxAbsRho: h1AbsRho, minGrowth: h1Growth / 100, notRho: h1NotRho },
     H2: { windowDays: h2Days, ratio: h2Ratio, share: h2Share / 100, notRatio: h2NotRatio, notShare: h2NotShare / 100 },
     H3: { sizeUsd: h3Size * 1000, maxImpact: h3Impact / 100, minTokens: h3Min, maxTokensNot: h3Max },
-    H4: { windowDays: h4Days, supported: h4Sup / 100, notSupported: h4Not / 100 },
-    H5: { windows: [7, 30] as const },
+    H4: { windowDays: h4Days, supported: h4Sup / 100, notSupported: h4Not / 100, maxTurnover: c.H4.wash_flags.max_daily_turnover, concMinShare: c.H4.wash_flags.concentration_min_share, concTvlMultiple: c.H4.wash_flags.concentration_tvl_multiple },
+    H5: { windows: [7, 30] as const, minCoverage: c.H5.min_coverage },
     H6: { incidentDate: c.H6.incident_date, baselineDays: h6Base, recoverShare: h6Sup / 100, withinDays: h6Days, failShare: h6Not / 100, atDay: h6At },
     index: t.index_rules,
   };

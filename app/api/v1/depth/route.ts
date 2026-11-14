@@ -7,7 +7,7 @@ export const OPTIONS = options;
 
 /** Depth matrix from the latest snapshot. ?token=<NEP-141 id or symbol>&size=1000|10000|100000|1000000 */
 export async function GET(req: NextRequest) {
-  const { snapshot, thresholds } = getPublished();
+  const { snapshot, thresholds } = await getPublished();
   if (!snapshot) return apiError(503, "no_snapshot", "No published snapshot yet.");
   const token = req.nextUrl.searchParams.get("token");
   const sizeRaw = req.nextUrl.searchParams.get("size");

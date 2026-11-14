@@ -30,15 +30,47 @@ export function readSnapshot(date: string, root = process.cwd()): Snapshot | nul
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
   const p = snapshotPath(date, root);
   if (!existsSync(p)) return null;
-  return readSnapshotFile(p).snapshot;
+  try {
+    return readSnapshotFile(p).snapshot;
+  } catch {
+    return null; // written under an older schema
+  }
 }
+/** Newest snapshot that parses under the current schema. */
 export function latestSnapshot(root = process.cwd()): Snapshot | null {
+  for (const d of listSnapshotDates(root).reverse()) {
+    const s = readSnapshot(d, root);
+    if (s) return s;
+  }
+  return null;
+}
+/** Raw JSON of the newest snapshot file, schema-agnostic (used to carry H2 days forward across schema changes). */
+export function latestSnapshotRaw(root = process.cwd()): Record<string, unknown> | null {
   const d = listSnapshotDates(root).at(-1);
-  return d ? readSnapshot(d, root) : null;
+  if (!d) return null;
+  try {
+    return JSON.parse(readFileSync(snapshotPath(d, root), "utf8"));
+  } catch {
+    return null;
+  }
+}
+/** data/snapshots/index.json: the manifest the app reads from the data branch. */
+export function writeManifest(root = process.cwd()) {
+  const dates = listSnapshotDates(root);
+  const sha256: Record<string, string> = {};
+  for (const d of dates) {
+    try {
+      sha256[d] = (JSON.parse(readFileSync(snapshotPath(d, root), "utf8")) as { sha256: string }).sha256;
+    } catch {}
+  }
+  const p = path.join(root, SNAPSHOT_DIR, "index.json");
+  writeFileSync(p, JSON.stringify({ dates, latest: dates.at(-1) ?? null, sha256 }, null, 1) + "\n");
+  return p;
 }
 export function writeSnapshot(s: Snapshot, root = process.cwd()) {
   mkdirSync(path.join(root, SNAPSHOT_DIR), { recursive: true });
   const p = snapshotPath(s.date, root);
   writeFileSync(p, JSON.stringify(s, null, 1) + "\n");
+  writeManifest(root);
   return p;
 }

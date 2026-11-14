@@ -1,9 +1,10 @@
 name: daily snapshot
-# Builds data/snapshots/YYYY-MM-DD.json from public sources and commits it.
+# 00:20 UTC: build data/snapshots/YYYY-MM-DD.json from public sources and commit it, with the
+# manifest (data/snapshots/index.json) and history, to the `data` branch. Never to main.
 # Read-only: no wallet, no signing. Optional keys are repository secrets, used server-side only.
 on:
   schedule:
-    - cron: "20 0 * * *" # 00:20 UTC daily
+    - cron: "20 0 * * *"
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -13,7 +14,7 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -23,22 +24,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check:thresholds
-      - run: pnpm flows --max-calls 20
+      - run: scripts/ci/data-branch.sh pull
+      - name: restore pending flow pages
+        uses: actions/cache/restore@v4
+        with:
+          path: _pending
+          key: prix-flows-pending-${{ github.run_id }}
+          restore-keys: prix-flows-pending-
+      - run: |
+          if [ -f _pending/intents-flow-buckets.json ]; then
+            node -e 'const f=require("fs");const a=JSON.parse(f.readFileSync("_pending/intents-flow-buckets.json"));let b={};try{b=JSON.parse(f.readFileSync("data/history/intents-flow-buckets.json"))}catch{};process.exit((a.updated_at||"")>(b.updated_at||"")?0:1)' \
+              && cp _pending/intents-flow-buckets.json data/history/ || true
+          fi
+      - run: pnpm flows --max-calls 30
         env:
           NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
       - run: pnpm snapshot:daily
         env:
+          PRIX_DATA_OFFLINE: "1"
           NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
           ONECLICK_API_KEY: ${{ secrets.ONECLICK_API_KEY }}
           ONECLICK_JWT: ${{ secrets.ONECLICK_JWT }}
           RHEA_AGGREGATOR_API_KEY: ${{ secrets.RHEA_AGGREGATOR_API_KEY }}
       - run: pnpm verdicts
-      - name: commit
-        run: |
-          git config user.name "prix-data[bot]"
-          git config user.email "prix-data@users.noreply.github.com"
-          git add data/snapshots data/history
-          git diff --cached --quiet && exit 0
-          git commit -m "data: snapshot $(date -u +%F)"
-          git pull --rebase --autostash
-          git push
+      - run: scripts/ci/data-branch.sh push

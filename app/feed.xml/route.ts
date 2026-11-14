@@ -7,12 +7,12 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 
 /** Atom feed: an entry whenever a claim's verdict differs from the previous published snapshot. */
 export async function GET(req: Request) {
-  const { thresholds, dates } = getPublished();
+  const { thresholds, dates } = await getPublished();
   const base = new URL(req.url).origin;
   const entries: { id: string; title: string; updated: string; link: string; body: string }[] = [];
   let prev = new Map<string, string>();
   for (const d of dates) {
-    const s = getSnapshotByDate(d);
+    const s = await getSnapshotByDate(d);
     if (!s) continue;
     const v = computeVerdicts(s, thresholds.rules, thresholds.t);
     for (const x of v) {

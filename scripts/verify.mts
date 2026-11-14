@@ -1,6 +1,10 @@
 /**
  * pnpm verify — re-derive the published snapshot and its verdicts.
  *
+ *  Source: the latest snapshot on the `data` branch (raw GitHub URL), falling back to the newest
+ *  snapshot bundled in data/snapshots/ if the data branch cannot be read. --snapshot <file> or
+ *  --bundled pins a local file.
+ *
  *  1. Offline: schema-validate the latest published snapshot, recompute its sha256, recompute the
  *     verdicts twice (determinism).
  *  2. Online (skipped with --offline): refetch every source, rebuild a snapshot in memory (nothing is
@@ -10,7 +14,9 @@
  *       - verdicts: must be identical unless --allow-verdict-drift
  *  Prints PASS or the diff; exits 1 on mismatch.
  */
-import { listSnapshotDates, readSnapshotFile, snapshotPath } from "../lib/snapshot/io.ts";
+import { listSnapshotDates, parseSnapshot, readSnapshotFile, snapshotPath } from "../lib/snapshot/io.ts";
+import { DATA_RAW, fetchManifest } from "../lib/snapshot/remote.ts";
+import { h4Breakdown } from "../lib/thesis/engine.ts";
 import { snapshotHash } from "../lib/snapshot/hash.ts";
 import { loadThresholds } from "../lib/thresholds/load.ts";
 import { computeVerdicts } from "../lib/thesis/engine.ts";
@@ -24,7 +30,31 @@ const tol = Number(arg("--tolerance", "0.10"));
 const htol = Number(arg("--history-tolerance", "0.01"));
 const offline = process.argv.includes("--offline");
 const allowDrift = process.argv.includes("--allow-verdict-drift");
-const file = arg("--snapshot", listSnapshotDates().map((d) => snapshotPath(d)).at(-1) ?? "");
+const bundledFile = listSnapshotDates().map((d) => snapshotPath(d)).reverse().find((f) => {
+  try {
+    readSnapshotFile(f);
+    return true;
+  } catch {
+    return false;
+  }
+});
+let file = arg("--snapshot", "");
+let loaded: ReturnType<typeof readSnapshotFile> | null = null;
+if (!file && !process.argv.includes("--bundled")) {
+  const m = await fetchManifest();
+  if (m?.latest) {
+    try {
+      const url = `${DATA_RAW}/snapshots/${m.latest}.json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      loaded = parseSnapshot(await res.text());
+      file = url;
+    } catch (e) {
+      console.log(`  data branch snapshot unreadable (${e instanceof Error ? e.message : e}); falling back to the bundled copy`);
+    }
+  } else console.log("  data branch manifest unreadable; falling back to the bundled copy");
+}
+if (!file) file = bundledFile ?? "";
 const out: string[] = [];
 const fail: string[] = [];
 const ok = (m: string) => out.push(`  ok    ${m}`);
@@ -34,7 +64,7 @@ if (!file) {
   console.log("FAIL: no published snapshot in data/snapshots/");
   process.exit(1);
 }
-const { snapshot: pub, hashOk } = readSnapshotFile(file);
+const { snapshot: pub, hashOk } = loaded ?? readSnapshotFile(file);
 console.log(`verify ${file}\n  published sha256 ${pub.sha256}`);
 if (hashOk) ok("schema valid, sha256 matches content");
 else bad(`sha256 mismatch: file says ${pub.sha256}, content hashes to ${snapshotHash(pub)}`);
@@ -87,6 +117,10 @@ if (!offline) {
   cmp("intents custody USD", pub.intents.custody_usd, fresh.intents.custody_usd, tol);
   cmp("RHEA clean TVL USD", pub.rhea.clean_tvl_usd, fresh.rhea.clean_tvl_usd, tol);
   cmp("RHEA rejected pools", pub.rhea.rejected_count, fresh.rhea.rejected_count, tol);
+  const hp = h4Breakdown(pub.series.pool_volume_all, pub.rhea.clean_tvl_usd, th.rules.H4);
+  const hf = h4Breakdown(fresh.series.pool_volume_all, fresh.rhea.clean_tvl_usd, th.rules.H4);
+  cmp("H4 all-pool window volume (denominator)", hp?.total, hf?.total, tol);
+  cmp("H4 verified-pool share", hp?.share, hf?.share, tol);
   const vf = computeVerdicts(fresh, th.rules, th.t);
   for (const a of v1) {
     const b = vf.find((x) => x.id === a.id)!;

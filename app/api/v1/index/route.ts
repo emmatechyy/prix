@@ -12,7 +12,7 @@ export const revalidate = 600;
 export async function GET() {
   try {
     const r = await getIndex();
-    const { snapshot, thresholds } = getPublished();
+    const { snapshot, thresholds } = await getPublished();
     return json({
       asOf: r.asOf,
       weights: WEIGHTS,

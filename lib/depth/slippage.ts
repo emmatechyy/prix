@@ -8,12 +8,14 @@ export const BASELINE_SIZE = 1_000;
 /**
  * Relative slippage of a quote vs the $1k baseline quote on the same route:
  *   1 - (out/in at size) / (out/in at $1k).
- * Fixed fees (e.g. the 20 bps unauthenticated 1Click app fee) cancel out. Never negative-clamped:
+ * Both quotes are first grossed up by the flat app fee (e.g. the 20 bps 1Click fee without a partner
+ * key), so the fee is reported on its own and never shows up as slippage. Never negative-clamped:
  * a negative value (better price at size) is reported as measured.
  */
-export function relativeSlippage(inUsd: number, outUsd: number, baseInUsd: number, baseOutUsd: number): number | null {
-  if (!(inUsd > 0 && outUsd > 0 && baseInUsd > 0 && baseOutUsd > 0)) return null;
-  return 1 - outUsd / inUsd / (baseOutUsd / baseInUsd);
+export function relativeSlippage(inUsd: number, outUsd: number, baseInUsd: number, baseOutUsd: number, feeBps = 0, baseFeeBps = feeBps): number | null {
+  if (!(inUsd > 0 && outUsd > 0 && baseInUsd > 0 && baseOutUsd > 0) || feeBps >= 10000 || baseFeeBps >= 10000) return null;
+  const net = (out: number, bps: number) => out / (1 - bps / 10000);
+  return 1 - net(outUsd, feeBps) / inUsd / (net(baseOutUsd, baseFeeBps) / baseInUsd);
 }
 
 /** Map an HTTP status + error message from a quote API to a depth status. */
@@ -35,7 +37,7 @@ export function applyBaselines(rows: DepthRow[]): DepthRow[] {
     const b = base.get(key(r));
     if (r.status !== "ok" || !b || r.amount_in_usd == null || r.amount_out_usd == null || b.amount_in_usd == null || b.amount_out_usd == null)
       return { ...r, relative_slippage: null };
-    return { ...r, relative_slippage: r.size_usd === BASELINE_SIZE ? 0 : relativeSlippage(r.amount_in_usd, r.amount_out_usd, b.amount_in_usd, b.amount_out_usd) };
+    return { ...r, relative_slippage: r.size_usd === BASELINE_SIZE ? 0 : relativeSlippage(r.amount_in_usd, r.amount_out_usd, b.amount_in_usd, b.amount_out_usd, r.app_fee_bps ?? 0, b.app_fee_bps ?? 0) };
   });
 }
 

@@ -32,8 +32,8 @@ const SOURCES: [string, string, string][] = [
   ["Incident reporting", "https://www.theblock.co/news/ecosystems/2026-10-01-near-intents-halts-services-after-3-8-million-exploit-promises-full-compensation-417404", "The 2026-10-01 NEAR Intents exploit date (also CoinDesk, 2026-10-01)"],
 ];
 
-export default function Methodology() {
-  const { thresholds: th, snapshot } = getPublished();
+export default async function Methodology() {
+  const { thresholds: th, snapshot } = await getPublished();
   return (
     <>
       <PageHeader eyebrow="Methodology" title="How every PRIX number is produced">
@@ -44,12 +44,12 @@ export default function Methodology() {
           <p className="flex flex-wrap items-center gap-2">
             <ThresholdsBadge version={th.t.version} locked={th.locked} />
             <span>
-              File <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/integration/thresholds/v1.yaml" target="_blank" rel="noreferrer"><code>thresholds/v1.yaml</code></a> · sha256 <code>{th.sha256.slice(0, 16)}…</code> · lock commit:{" "}
+              File <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/main/thresholds/v1.yaml" target="_blank" rel="noreferrer"><code>thresholds/v1.yaml</code></a> · sha256 <code>{th.sha256.slice(0, 16)}…</code> · lock commit:{" "}
               {th.locked ? <code>{th.t.locked_at_commit}</code> : <strong>not set (DRAFT)</strong>}
             </span>
           </p>
           <p>
-            Every verdict threshold lives in one YAML file that is validated with zod at build time; the build fails if it does not parse. Once a human sets <code>locked_at_commit</code> to the commit that introduced it, any change becomes <code>v2.yaml</code> and old and new verdicts are shown side by side. Until then every verdict on this site is labelled <strong>DRAFT, not locked</strong>. Differences from PRIX&apos;s earlier rules are listed in <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/integration/docs/threshold-diff.md" target="_blank" rel="noreferrer">docs/threshold-diff.md</a>.
+            Every verdict threshold lives in one YAML file that is validated with zod at build time; the build fails if it does not parse. Once a human sets <code>locked_at_commit</code> to the commit that introduced it, any change becomes <code>v2.yaml</code> and old and new verdicts are shown side by side. Until then every verdict on this site is labelled <strong>DRAFT, not locked</strong>. Differences from PRIX&apos;s earlier rules are listed in <a className="underline underline-offset-4 hover:text-text" href="https://github.com/emmatechyy/prix/blob/main/docs/threshold-diff.md" target="_blank" rel="noreferrer">docs/threshold-diff.md</a>.
           </p>
           <div className="scroll-x -mx-5 sm:-mx-6">
             <table className="data">
@@ -74,7 +74,7 @@ export default function Methodology() {
             <strong>Evidence grades.</strong> A = {th.t.global.evidence_grades.A}; B = {th.t.global.evidence_grades.B}; C = {th.t.global.evidence_grades.C}. H3 drops to C when a passing token&apos;s depth comes only from AMM reserve math.
           </p>
           <p>
-            <strong>Snapshots.</strong> A GitHub Action builds <code>data/snapshots/YYYY-MM-DD.json</code> once a day and commits it; its <code>sha256</code> is the hash of the canonical JSON (sorted keys) of everything else in the file. Every API response carries it as <code>source_hash</code>. Latest: {snapshot ? <a className="underline underline-offset-4 hover:text-text" href={`/api/v1/snapshots/${snapshot.date}`}><code>{snapshot.date}</code> · <code>{snapshot.sha256.slice(0, 16)}…</code></a> : "none"}. Re-run: <code>pnpm verdicts</code> (offline) and <code>pnpm verify</code> (refetch and diff).
+            <strong>Snapshots.</strong> A GitHub Action on <code>main</code> builds <code>data/snapshots/YYYY-MM-DD.json</code> once a day and commits it to the separate <code>data</code> branch (flow pages are fetched every 30 minutes and committed hourly; pushes to <code>data</code> never deploy). The site reads the latest snapshot from that branch, revalidated every 30 minutes, and falls back to the last good snapshot bundled with the deployment if the fetch fails or the hash does not match. Each file&apos;s <code>sha256</code> is the hash of the canonical JSON (sorted keys) of everything else in the file. Every API response carries it as <code>source_hash</code>. Latest: {snapshot ? <a className="underline underline-offset-4 hover:text-text" href={`/api/v1/snapshots/${snapshot.date}`}><code>{snapshot.date}</code> · <code>{snapshot.sha256.slice(0, 16)}…</code></a> : "none"}. Re-run: <code>pnpm verdicts</code> (offline) and <code>pnpm verify</code> (refetch and diff).
           </p>
         </Section>
 
@@ -126,7 +126,8 @@ export default function Methodology() {
             <li><strong>Round trip</strong> — a buy and a sell of the same token within 10 minutes whose USD sizes are within 2% (each ≥ $50). It is a pattern, not proof of wash trading.</li>
             <li><strong>Volume spike</strong> — 7-day average daily volume more than 2× the prior 30-day average.</li>
             <li><strong>Whale</strong> — any swap or liquidity move ≥ ${WHALE_USD.toLocaleString()}, sampled from the latest 50 swaps in the 16 busiest verified pools and the latest liquidity events in the 14 deepest. Swap size uses the smaller leg. The 18 largest swaps and 20 newest LP moves are traced receipt → transaction → signer.</li>
-            <li><strong>Intents flows</strong> — the latest intents.near token events from NearBlocks: MINT = deposit, BURN = withdrawal, valued at the price recorded on each event. The window is stated wherever it is shown.</li>
+            <li><strong>Intents flows</strong> — intents.near token events from NearBlocks, paged newest-first with a stored cursor: each run pages back from now to the newest instant already read, and unread stretches are kept as gaps that later runs resume. MINT = deposit, BURN = withdrawal, valued at the price recorded on each event. <strong>Coverage</strong> = hours of the window actually read ÷ hours in the window; H5 needs ≥ {(th.t.claims.H5.min_coverage * 100).toFixed(0)}% of both the 7d and 30d windows before it gives any verdict. Nothing is scaled up to cover what was not read.</li>
+            <li><strong>H4 volume from verified pools</strong> — numerator: 30-day volume of pools that are not rejected and not wash-flagged; denominator: 30-day volume of <em>every</em> live pool (≥ $1k TVL), rejected and flagged included. Wash flags: mean daily volume above {th.t.claims.H4.wash_flags.max_daily_turnover}× the pool&apos;s TVL, or ≥ {(th.t.claims.H4.wash_flags.concentration_min_share * 100).toFixed(0)}% of all volume while more than {th.t.claims.H4.wash_flags.concentration_tvl_multiple}× its share of clean TVL. These are signals, not proof: concentrated-liquidity pools turn over their TVL faster by design.</li>
           </ul>
         </Section>
 
@@ -173,7 +174,7 @@ export default function Methodology() {
             <li>H5 net flow is a sample (one page of up to 100 events per slot), day-weighted and never extrapolated; it gives a direction, not a total.</li>
             <li>H6 custody is a quantity index at today&apos;s prices for the largest assets that existed throughout the window; tokens launched after the incident are left out rather than counted as recovery.</li>
             <li>The RHEA aggregator V2 route needs a key from boss.rhea.finance and is reported as not configured; V1 router quotes and AMM math are used instead.</li>
-            <li>1Click quotes without a partner key include a 20 bps app fee, identical at every size, so it cancels out of relative slippage.</li>
+            <li>1Click quotes without a partner key carry a flat 0.2% (20 bps) app fee. PRIX records it as its own field (<code>app_fee_bps</code>, <code>fee_usd</code>) on every Intents depth row and computes relative slippage net of it: both the sized quote and the $1k baseline are grossed up by their fee before the ratio is taken, so the fee never shows up as depth. RHEA rows keep the current Smart Router V1 (no aggregator token yet) and every depth row names its router and version.</li>
           </ul>
         </Section>
       </div>

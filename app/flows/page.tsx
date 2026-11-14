@@ -26,7 +26,7 @@ type W = keyof typeof WINDOWS;
 export default async function Flows({ searchParams }: { searchParams: Promise<{ w?: string }> }) {
   const q = (await searchParams).w;
   const w: W = q === "24h" || q === "30d" ? q : "7d";
-  const pub = getPublished();
+  const pub = await getPublished();
   const lending = await safe(getLending);
   const [idx, flows, custody] = await Promise.all([safe(getIndex), safe(getIntentsFlows), safe(getIntentsCustody)]);
   const sectors = idx.ok ? sectorBreakdown(idx.v.market) : null;

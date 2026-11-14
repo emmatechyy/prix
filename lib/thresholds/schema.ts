@@ -30,7 +30,15 @@ export const ThresholdsSchema = z.object({
     missing_data: z.literal("not reported"),
     evidence_grades: z.object({ A: z.string(), B: z.string(), C: z.string() }),
   }),
-  claims: z.object({ H1: Claim, H2: Claim, H3: Claim, H4: Claim, H5: Claim, H6: Claim.extend({ incident_date: Claim.shape.incident_date.unwrap() }) }),
+  claims: z.object({
+    H1: Claim,
+    H2: Claim,
+    H3: Claim,
+    H4: Claim.extend({
+      denominator: z.string().min(5),
+      wash_flags: z.object({ max_daily_turnover: z.number().positive(), concentration_min_share: z.number().positive().max(1), concentration_tvl_multiple: z.number().positive() }),
+    }),
+    H5: Claim.extend({ min_coverage: z.number().positive().max(1) }), H6: Claim.extend({ incident_date: Claim.shape.incident_date.unwrap() }) }),
   index_rules: z.object({
     min_liquidity_usd: z.number().positive(),
     max_price_impact_10k: z.number().positive().max(1),

@@ -28,6 +28,7 @@ export function oneClickAuth(): { mode: "api-key" | "jwt" | "none"; headers: Rec
   return { mode: "none", headers: {} };
 }
 
+export const ONECLICK_ROUTER_VERSION = "1Click API v0 · dry quote";
 type QuoteOk = { quote: { amountInUsd?: string; amountOutUsd?: string }; quoteRequest?: { appFees?: { fee: number }[] } };
 
 async function dryQuote(origin: string, destination: string, amount: string, headers: Record<string, string>) {
@@ -79,7 +80,7 @@ export async function getIntentsDepth(candidates: string[], { maxTokens = 8, cap
   const unlisted = candidates.filter((t) => !byId.has(`nep141:${t}`));
   const fetched_at0 = new Date().toISOString();
   const unlistedRows: DepthRow[] = unlisted.flatMap((token) =>
-    DEPTH_SIZES.map((size) => ({ route: "intents" as const, router: "1click-dry", origin: "any", destination_token: `nep141:${token}`, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at: fetched_at0, status: "no-route" as const, error: "token not listed by 1Click /v0/tokens (no quote requested)" })),
+    DEPTH_SIZES.map((size) => ({ route: "intents" as const, router: "1click-dry", router_version: ONECLICK_ROUTER_VERSION, app_fee_bps: null, origin: "any", destination_token: `nep141:${token}`, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at: fetched_at0, status: "no-route" as const, error: "token not listed by 1Click /v0/tokens (no quote requested)" })),
   );
   const jobs: { origin: (typeof ORIGINS)[number]; token: string; size: number }[] = [];
   for (const token of listed) for (const origin of ORIGINS) for (const size of DEPTH_SIZES) jobs.push({ origin, token, size });
@@ -87,7 +88,7 @@ export async function getIntentsDepth(candidates: string[], { maxTokens = 8, cap
   const fetched_at = new Date().toISOString();
   const settled = await mapLimit(jobs, concurrency, async ({ origin, token, size }): Promise<DepthRow> => {
     const dest = `nep141:${token}`;
-    const base: Omit<DepthRow, "status"> = { route: "intents", router: "1click-dry", origin: origin.symbol, destination_token: dest, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
+    const base: Omit<DepthRow, "status"> = { route: "intents", router: "1click-dry", router_version: ONECLICK_ROUTER_VERSION, app_fee_bps: null, origin: origin.symbol, destination_token: dest, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
     const o = byId.get(origin.assetId);
     if (!o || !(o.price > 0)) return { ...base, status: "error", error: `origin ${origin.symbol} has no 1Click price` };
     if (!byId.has(dest)) return { ...base, status: "no-route", error: "token not listed by 1Click /v0/tokens" };
@@ -98,7 +99,7 @@ export async function getIntentsDepth(candidates: string[], { maxTokens = 8, cap
     const inUsd = Number(q.body.quote.amountInUsd);
     const outUsd = Number(q.body.quote.amountOutUsd);
     const feeBps = (q.body.quoteRequest?.appFees ?? []).reduce((a, f) => a + f.fee, 0);
-    return { ...base, quote_ms: q.ms, amount_in_usd: Number.isFinite(inUsd) ? inUsd : null, amount_out_usd: Number.isFinite(outUsd) ? outUsd : null, fee_usd: Number.isFinite(inUsd) ? (inUsd * feeBps) / 10000 : null, status: "ok" };
+    return { ...base, quote_ms: q.ms, amount_in_usd: Number.isFinite(inUsd) ? inUsd : null, amount_out_usd: Number.isFinite(outUsd) ? outUsd : null, fee_usd: Number.isFinite(inUsd) ? (inUsd * feeBps) / 10000 : null, app_fee_bps: feeBps, status: "ok" };
   });
   const rows = settled.filter((r): r is DepthRow => r != null);
   const out = [...applyBaselines(rows), ...unlistedRows];

@@ -3,7 +3,7 @@ import { applyBaselines, bestImpact, relativeSlippage, statusFromError, usdToBas
 import type { DepthRow } from "@/lib/snapshot/schema";
 
 const row = (p: Partial<DepthRow>): DepthRow => ({
-  route: "intents", router: "1click-dry", origin: "ETH", destination_token: "nep141:x", token_id: "x", size_usd: 1000,
+  route: "intents", router: "1click-dry", router_version: "1Click API v0 · dry quote", app_fee_bps: 20, origin: "ETH", destination_token: "nep141:x", token_id: "x", size_usd: 1000,
   amount_in_usd: 1000, amount_out_usd: 990, fee_usd: 2, relative_slippage: null, quote_ms: 400, status: "ok", fetched_at: "2026-11-13T00:00:00Z", ...p,
 });
 
@@ -19,6 +19,11 @@ describe("relative slippage", () => {
   });
   it("returns null on missing inputs", () => {
     expect(relativeSlippage(0, 1, 1, 1)).toBeNull();
+  });
+  it("is net of the flat app fee, even when the fee differs between size and baseline", () => {
+    // $1k baseline with a 20 bps fee: 998 out; $10k with no fee: 10,000 out. Same rate net of fees.
+    expect(relativeSlippage(10_000, 10_000, 1_000, 998, 0, 20)).toBeCloseTo(0, 12);
+    expect(relativeSlippage(10_000, 9_980, 1_000, 998, 20)).toBeCloseTo(0, 12);
   });
   it("fills rows from the same route's baseline only", () => {
     const rows = applyBaselines([

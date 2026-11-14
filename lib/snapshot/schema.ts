@@ -9,6 +9,8 @@ export const DepthRowSchema = z.object({
   route: z.enum(["intents", "rhea-router"]),
   /** Which concrete router produced the row (e.g. "1click-dry", "smartrouter-v1", "aggregator-v2"). */
   router: z.string(),
+  /** Human label of the router and its version, shown on every depth row. */
+  router_version: z.string(),
   origin: z.string(),
   destination_token: z.string(),
   /** Index token this row measures (the token being bought via Intents, or sold via RHEA). */
@@ -17,7 +19,9 @@ export const DepthRowSchema = z.object({
   amount_in_usd: nnum,
   amount_out_usd: nnum,
   fee_usd: nnum,
-  /** 1 − (out/in at size) ÷ (out/in at the $1k baseline). Null when either quote is missing. */
+  /** Flat app fee charged by the quoting API (1Click without a partner key: 20 bps). Null when none applies. */
+  app_fee_bps: nnum,
+  /** 1 − (out/in at size) ÷ (out/in at the $1k baseline), both net of the flat app fee. Null when either quote is missing. */
   relative_slippage: nnum,
   quote_ms: nnum,
   status: DepthStatus,
@@ -95,10 +99,29 @@ export const SnapshotSchema = z.object({
     /** Daily intents custody ÷ clean RHEA TVL, both from the same day's snapshot (carried forward). */
     h2_daily: z.array(z.object({ date: isoDate, custody_usd: num, clean_tvl_usd: num, ratio: num, snapshot_sha256: z.string() })),
     flow_buckets: z.array(FlowBucketSchema),
-    /** Daily volume of pools with history, split into organic (clean, unflagged) and total. */
-    pool_volume: z.array(z.object({ date: isoDate, total_usd: num, organic_usd: num, pools: z.number().int() })),
+    /**
+     * H4: daily USD volume of every live pool (>= $1k TVL) that traded in the window, rejected
+     * included. `daily[i]` is the volume on `dates[i]`. Pools with no volume are counted in pools_live.
+     */
+    pool_volume_all: z
+      .object({
+        dates: z.array(isoDate),
+        pools_live: z.number().int(),
+        pools_unreported: z.number().int(),
+        protocol_volume_24h_usd: nnum,
+        all_pool_volume_last_day_usd: nnum,
+        rows: z.array(z.object({ id: z.string(), pair: z.string(), kind: z.string(), tvl_usd: num, rejected: z.boolean(), token_flagged: z.boolean(), daily: z.array(num) })),
+      })
+      .nullable(),
   }),
-  incident: z.object({ date: isoDate, sources: z.array(z.string()) }),
+  incident: z.object({
+    /** H6 baseline parameter: the date the incident was reported. */
+    date: isoDate,
+    date_basis: z.literal("reported"),
+    sources: z.array(z.object({ kind: z.enum(["official", "press"]), publisher: z.string(), url: z.string().url(), published: z.string(), amount_usd: nnum, timing: z.string() })),
+    amount_usd_range: z.object({ low: num, high: num }),
+    timing_range: z.object({ from: z.string(), to: z.string(), note: z.string() }),
+  }),
   sources: z.array(z.object({ url: z.string(), fetched_at: z.string(), sha256: z.string() })),
   errors: z.array(z.object({ step: z.string(), message: z.string() })),
   sha256: z.string(),

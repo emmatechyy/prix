@@ -6,7 +6,8 @@ import { TimeChart } from "@/components/chart";
 import { SERIES } from "@/lib/palette";
 import { getPublished } from "@/lib/server/published";
 import type { Snapshot } from "@/lib/snapshot/schema";
-import type { Verdict } from "@/lib/thesis/engine";
+import { h4Breakdown, type Verdict } from "@/lib/thesis/engine";
+import type { Rules } from "@/lib/thresholds/rules";
 import { median } from "@/lib/thesis/stats";
 import { num, usd } from "@/lib/format";
 
@@ -17,7 +18,7 @@ const dirCls = { for: "text-up", against: "text-danger", neutral: "text-muted" }
 const dirLabel = { for: "for", against: "against", neutral: "context" } as const;
 
 /** The series each claim is computed from, for the history sparkline. */
-function history(id: Verdict["id"], s: Snapshot): { values: number[]; label: string } | null {
+function history(id: Verdict["id"], s: Snapshot, rules: Rules): { values: number[]; label: string } | null {
   const S = s.series;
   switch (id) {
     case "H1":
@@ -25,12 +26,15 @@ function history(id: Verdict["id"], s: Snapshot): { values: number[]; label: str
     case "H2":
       return S.h2_daily.length > 1 ? { values: S.h2_daily.map((d) => d.ratio), label: `custody ÷ clean TVL, ${S.h2_daily.length} snapshots` } : null;
     case "H4":
-      return { values: S.pool_volume.slice(-30).map((d) => (d.total_usd > 0 ? d.organic_usd / d.total_usd : NaN)), label: "organic share of pool volume, 30d" };
+    {
+      const b = h4Breakdown(S.pool_volume_all, s.rhea.clean_tvl_usd, rules.H4);
+      return b ? { values: b.daily.map((d) => (d.total > 0 ? d.organic / d.total : NaN)), label: `daily share of all-pool volume from verified pools, ${b.daily.length}d` } : null;
+    }
     case "H5": {
       const by = new Map<string, number[]>();
       for (const b of S.flow_buckets) by.set(b.end.slice(0, 10), [...(by.get(b.end.slice(0, 10)) ?? []), b.deposits_usd - b.withdrawals_usd]);
       const v = [...by.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, xs]) => xs.reduce((a, x) => a + x, 0) / xs.length);
-      return v.length > 1 ? { values: v, label: `sampled net flow per day, ${v.length} days` } : null;
+      return v.length > 1 ? { values: v, label: `observed net flow per day, ${v.length} days (partial coverage)` } : null;
     }
     case "H6":
       return { values: S.custody_constant.map((d) => d.usd), label: "custody at constant prices since Sep" };
@@ -48,8 +52,8 @@ function Field({ k, children }: { k: string; children: React.ReactNode }) {
   );
 }
 
-export default function Thesis() {
-  const { snapshot: s, verdicts, thresholds } = getPublished();
+export default async function Thesis() {
+  const { snapshot: s, verdicts, thresholds } = await getPublished();
   return (
     <>
       <PageHeader eyebrow="Investment thesis" title="Is NEAR a long-term investment? Six claims, pre-registered.">
@@ -69,7 +73,7 @@ export default function Thesis() {
             ))}
           </nav>
           {verdicts.map((v) => {
-            const h = history(v.id, s);
+            const h = history(v.id, s, thresholds.rules);
             return (
               <article key={v.id} aria-labelledby={v.id} className="grid scroll-mt-28 gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12">
                 <div className="appear lg:sticky lg:top-28 lg:self-start">
@@ -79,6 +83,19 @@ export default function Thesis() {
                     <Badge tone={VERDICT_TONE[v.verdict]}>{v.id} · {v.verdict}</Badge>
                     <Badge title="A: direct on-chain · B: indexer/API · C: derived or modelled">evidence grade {v.evidence_grade}</Badge>
                   </div>
+                  {v.coverage && (
+                    <div className="mt-5 max-w-[240px]" aria-label={`Coverage ${(v.coverage.share * 100).toFixed(2)} percent; needs ${(v.coverage.min * 100).toFixed(0)} percent`}>
+                      <p className="flex items-baseline justify-between text-[13px] text-muted">
+                        <span>Coverage (lower of 7d, 30d)</span>
+                        <span className={`num ${v.coverage.share >= v.coverage.min ? "text-up" : "text-danger"}`}>{(v.coverage.share * 100).toFixed(2)}%</span>
+                      </p>
+                      <div className="relative mt-1.5 h-2 rounded-full bg-surface">
+                        <div className="h-2 rounded-full bg-accent" style={{ width: `${Math.max(0.5, Math.min(100, v.coverage.share * 100))}%` }} />
+                        <div className="absolute top-[-3px] h-[14px] w-[2px] bg-ink" style={{ left: `${v.coverage.min * 100}%` }} title="minimum coverage" />
+                      </div>
+                      <p className="mt-1 text-[12.5px] text-faint">{v.coverage.hours.toFixed(1)} of {v.coverage.window_hours} h observed (30d); a verdict needs ≥ {(v.coverage.min * 100).toFixed(0)}% of the 7d and 30d windows. Nothing is extrapolated.</p>
+                    </div>
+                  )}
                   {h && (
                     <div className="mt-5">
                       <Sparkline values={h.values} width={220} height={40} />
@@ -95,7 +112,7 @@ export default function Thesis() {
                     <dl className="grid gap-x-8 gap-y-4 px-5 py-5 sm:grid-cols-2 sm:px-6">
                       <Field k="Metric">{v.metric}</Field>
                       <Field k={`Measured (${v.metric_label})`}>
-                        <span className="num text-ink">{v.metric_value == null ? "not reported" : Math.abs(v.metric_value) >= 1000 ? usd(v.metric_value) : num(v.metric_value, 3)}</span>
+                        <span className="num text-ink">{v.metric_value == null ? "not reported" : Math.abs(v.metric_value) >= 1000 ? usd(v.metric_value) : /share/.test(v.metric_label) ? `${(v.metric_value * 100).toFixed(1)}%` : num(v.metric_value, 3)}</span>
                       </Field>
                       <Field k="Supported if">{v.threshold_supported}</Field>
                       <Field k="Not supported if">{v.threshold_not_supported}</Field>
@@ -126,7 +143,7 @@ export default function Thesis() {
                           <tbody>
                             {v.evidence.map((e) => (
                               <tr key={e.label}>
-                                <td className="min-w-[220px] whitespace-normal text-muted">{e.label}</td>
+                                <td className="min-w-[220px] whitespace-normal text-muted"><div className="max-w-[420px] whitespace-normal">{e.label}</div></td>
                                 <td className="r num text-ink"><div className="ml-auto w-max max-w-[220px] whitespace-normal break-words">{e.value}</div></td>
                                 <td className={`text-[13px] font-medium ${dirCls[e.dir]}`}>{dirLabel[e.dir]}</td>
                                 <td><EvidenceSource source={e.source} date={s.date} /></td>
@@ -161,17 +178,19 @@ function IncidentPanel({ s }: { s: Snapshot }) {
   return (
     <Card>
       <CardHeader
-        title="Before and after 2026-10-01"
+        title={`Before and after ${D} (reported)`}
         subtitle={
           <>
-            Incident date from{" "}
-            {s.incident.sources.map((u, i) => (
-              <span key={u}>
-                {i > 0 && " and "}
-                <a href={u} target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text">{new URL(u).host.replace("www.", "")}</a>
+            Incident date <strong>{D} (reported)</strong>; it only sets the H6 baseline. Reported loss{" "}
+            {s.incident.amount_usd_range.low === s.incident.amount_usd_range.high ? usd(s.incident.amount_usd_range.low, { compact: true }) : `${usd(s.incident.amount_usd_range.low, { compact: true })}–${usd(s.incident.amount_usd_range.high, { compact: true })}`}
+            {s.incident.amount_usd_range.low === s.incident.amount_usd_range.high ? " (all sources agree)" : ""}; timing range {s.incident.timing_range.from.slice(0, 16).replace("T", " ")} – {s.incident.timing_range.to.slice(0, 16).replace("T", " ")} UTC ({s.incident.timing_range.note}). Sources:{" "}
+            {s.incident.sources.map((x, i) => (
+              <span key={x.url}>
+                {i > 0 && "; "}
+                <a href={x.url} target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text">{x.publisher}</a> ({x.kind}, {x.published.slice(0, 10)})
               </span>
-            ))}{" "}
-            (both dated 2026-10-01). Custody is a quantity index: archival <code className="num">ft_balance_of(intents.near)</code> at the first block of each UTC day for {s.series.custody_constant_meta.assets.map((a) => a.symbol).join(", ")}
+            ))}
+            . Custody is a quantity index: archival <code className="num">ft_balance_of(intents.near)</code> at the first block of each UTC day for {s.series.custody_constant_meta.assets.map((a) => a.symbol).join(", ")}
             {" "}({(s.series.custody_constant_meta.coverage * 100).toFixed(0)}% of today&apos;s custody), valued at this snapshot&apos;s prices.
           </>
         }

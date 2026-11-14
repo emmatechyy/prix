@@ -3,8 +3,10 @@ import { fetchJson, mapLimit } from "../http";
 import { getIndex } from "../model/index-model";
 import { getIntentsCustody, getIntentsFlows } from "../model/network";
 import { getNetworkCharts, nearblocksUrls } from "../sources/near";
-import { getHistoricalTvl, getPoolHistory, rheaUrls } from "../sources/rhea";
-import { NEARBLOCKS } from "../sources/endpoints";
+import { getHistoricalTvl, getPoolVolume, rheaUrls } from "../sources/rhea";
+import { compileRules } from "../thresholds/rules";
+import { h4Breakdown } from "../thesis/engine";
+import { NEARBLOCKS, RHEA_API } from "../sources/endpoints";
 import { archivalSource } from "../sources/archival";
 import { getIntentsDepth } from "../depth/intents-depth";
 import { aggregatorAuth, getRheaDepth } from "../depth/rhea-router";
@@ -17,18 +19,26 @@ import { addDays, median } from "../thesis/stats";
 import type { Thresholds } from "../thresholds/schema";
 import { canonical, sha256, snapshotHash } from "./hash";
 import { SnapshotSchema, type DepthRow, type Snapshot } from "./schema";
-import { latestSnapshot } from "./io";
+import { latestSnapshotRaw } from "./io";
 
-export const METHODOLOGY_VERSION = "2.0";
-/** Incident sources (verified 2026-11-13; see docs/sdk-notes.md §H6). */
-export const INCIDENT_SOURCES = [
-  "https://www.coindesk.com/tech/2026/10/01/near-intents-hit-by-usd3-8-million-exploit-as-crypto-s-rough-year-of-hacks-continues",
-  "https://www.theblock.co/news/ecosystems/2026-10-01-near-intents-halts-services-after-3-8-million-exploit-promises-full-compensation-417404",
-];
+export const METHODOLOGY_VERSION = "2.1";
+/**
+ * H6 incident sources (read 2026-11-14). The incident date is "reported": it is the day the
+ * incident was disclosed and only sets the H6 baseline. Where sources differ, both ends are shown.
+ */
+export const INCIDENT: Omit<Snapshot["incident"], "date"> = {
+  date_basis: "reported",
+  sources: [
+    { kind: "official", publisher: "NEAR Intents (@near_intents) on X", url: "https://x.com/near_intents/status/2105642219357241796", published: "2026-10-01T12:53:20Z", amount_usd: 3.8e6, timing: "services stopped 1 Oct after an incident was detected; preliminary loss ≈ $3.8M" },
+    { kind: "official", publisher: "Alex Shevchenko (NEAR Intents GM), postmortem on X", url: "https://x.com/AlexAuroraDev/status/2111124226962870770", published: "2026-10-16T15:56:53Z", amount_usd: 3.8e6, timing: "withdrawals 29 Sep 16:14 – 1 Oct 05:54 UTC; detected 1 Oct 08:04 UTC; contract paused 08:33 UTC; funds returned 2 Oct" },
+    { kind: "press", publisher: "CoinDesk", url: "https://www.coindesk.com/tech/2026/10/01/near-intents-hit-by-usd3-8-million-exploit-as-crypto-s-rough-year-of-hacks-continues", published: "2026-10-01", amount_usd: 3.8e6, timing: "reported 1 Oct" },
+    { kind: "press", publisher: "The Block", url: "https://www.theblock.co/news/ecosystems/2026-10-01-near-intents-halts-services-after-3-8-million-exploit-promises-full-compensation-417404", published: "2026-10-01", amount_usd: 3.8e6, timing: "reported 1 Oct; services halted" },
+  ],
+  amount_usd_range: { low: 3.8e6, high: 3.8e6 },
+  timing_range: { from: "2026-09-29T16:14:00Z", to: "2026-10-01T08:04:00Z", note: "first exploit withdrawal (postmortem) to detection (postmortem); press and the official 1 Oct post date it 1 Oct" },
+};
 export const CUSTODY_ASSETS = 8;
 export const INTENTS_DEPTH_TOKENS = 8;
-const POOL_HISTORY_CLEAN = 25;
-const POOL_HISTORY_REJECTED = 15;
 
 type Log = (m: string) => void;
 const nbHeaders = (): Record<string, string> => (process.env.NEARBLOCKS_API_KEY ? { authorization: `Bearer ${process.env.NEARBLOCKS_API_KEY}` } : {});
@@ -174,9 +184,10 @@ export async function buildSnapshot(opts: { thresholds: Thresholds; thresholdsSh
   }
 
   // ---- H2 daily: carry forward previous snapshots' entries and add today's
-  const prev = latestSnapshot();
-  const h2_prev = (prev?.series.h2_daily ?? []).filter((d) => d.date < date);
-  if (prev && prev.date < date && !h2_prev.some((d) => d.date === prev.date) && prev.intents.custody_usd != null && prev.rhea.clean_tvl_usd)
+  // Read schema-agnostically so H2 days survive snapshot schema changes.
+  const prev = latestSnapshotRaw() as null | { date: string; sha256: string; intents: { custody_usd: number | null }; rhea: { clean_tvl_usd: number | null }; series?: { h2_daily?: Snapshot["series"]["h2_daily"] } };
+  const h2_prev = (prev?.series?.h2_daily ?? []).filter((d) => d.date < date);
+  if (prev && prev.date < date && !h2_prev.some((d) => d.date === prev.date) && prev.intents?.custody_usd != null && prev.rhea?.clean_tvl_usd)
     h2_prev.push({ date: prev.date, custody_usd: prev.intents.custody_usd, clean_tvl_usd: prev.rhea.clean_tvl_usd, ratio: prev.intents.custody_usd / prev.rhea.clean_tvl_usd, snapshot_sha256: prev.sha256 });
   const h2_daily = [...h2_prev];
   if (custody && rhea.clean_tvl_usd) h2_daily.push({ date, custody_usd: custody.total, clean_tvl_usd: rhea.clean_tvl_usd, ratio: custody.total / rhea.clean_tvl_usd, snapshot_sha256: "this-snapshot" });
@@ -187,34 +198,37 @@ export async function buildSnapshot(opts: { thresholds: Thresholds; thresholdsSh
   const flow_buckets = fh.buckets.filter((b) => b.end >= cutoff && b.end <= now.toISOString());
   src(`${NEARBLOCKS}/v3/intents/txns?limit=100&before_ts=… (sampled; data/history/${FLOWS_FILE})`, flow_buckets);
 
-  // ---- Pool volume history (H4): organic = clean pool whose tokens carry no wash-trading flag
-  let pool_volume: Snapshot["series"]["pool_volume"] = [];
+  // ---- Pool volume, ALL live pools (H4). Denominator = every pool with >= $1k TVL, rejected and
+  // flagged included; the engine applies the thresholds' wash flags to these per-pool rows.
+  let pool_volume_all: Snapshot["series"]["pool_volume_all"] = null;
   if (m && idx) {
     const washy = new Set(idx.rows.filter((r) => r.flags.some((f) => /round-trip|abnormal turnover/.test(f))).map((r) => r.id));
-    const cleanVol = clean.filter((p) => (p.volume24h ?? 0) > 0).sort((a, b) => (b.volume24h ?? 0) - (a.volume24h ?? 0)).slice(0, POOL_HISTORY_CLEAN);
-    const pools = [...cleanVol, ...rejected.slice(0, POOL_HISTORY_REJECTED)];
-    const hist = await step("Pool volume histories", errors, log, () => mapLimit(pools, 4, (p) => getPoolHistory(p.id)));
+    const winDays = compileRules(opts.thresholds).H4.windowDays;
+    const dates = Array.from({ length: winDays }, (_, i) => addDays(date, -winDays + i));
+    const hist = await step(`Pool volume histories (all ${live.length} live pools)`, errors, log, () => mapLimit(live, 12, (p) => getPoolVolume(p.id)));
     if (hist) {
-      const by = new Map<string, { total: number; organic: number; pools: number }>();
-      pools.forEach((p, i) => {
+      const rows: NonNullable<Snapshot["series"]["pool_volume_all"]>["rows"] = [];
+      let unreported = 0;
+      live.forEach((p, i) => {
         const h = hist[i];
-        if (!h) return;
-        const organic = p.clean && !p.tokens.some((t) => washy.has(t));
-        for (const v of h.volume) {
-          if (!(v.value >= 0)) continue;
-          const e = by.get(v.date) ?? { total: 0, organic: 0, pools: 0 };
-          e.total += v.value;
-          if (organic) e.organic += v.value;
-          e.pools++;
-          by.set(v.date, e);
-        }
+        if (!h) return void unreported++;
+        const by = new Map(h.filter((v) => v.value >= 0).map((v) => [v.date, v.value]));
+        const daily = dates.map((d) => Math.round((by.get(d) ?? 0) * 100) / 100);
+        if (!daily.some((v) => v > 0)) return;
+        rows.push({ id: p.id, pair: p.symbols.join("/"), kind: p.kind, tvl_usd: Math.round(p.tvl), rejected: !p.clean, token_flagged: p.tokens.some((t) => washy.has(t)), daily });
       });
-      pool_volume = [...by.entries()].filter(([d]) => d >= addDays(date, -60) && d < date).sort(([a], [b]) => a.localeCompare(b)).map(([d, e]) => ({ date: d, total_usd: e.total, organic_usd: e.organic, pools: e.pools }));
-      const last = pool_volume.at(-1);
-      rhea.volume_organic_share = last && last.total_usd > 0 ? last.organic_usd / last.total_usd : null;
-      src(`${rheaUrls.poolVolumeBase} (${pools.length} pools)`, pool_volume);
-      const missing = hist.filter((x) => !x).length;
-      if (missing) errors.push({ step: "Pool volume histories", message: `${missing} of ${pools.length} pool histories not reported` });
+      if (unreported) errors.push({ step: "Pool volume histories", message: `${unreported} of ${live.length} pool volume histories not reported (left out of numerator and denominator)` });
+      const lastDay = rows.reduce((a, r) => a + r.daily[r.daily.length - 1], 0);
+      pool_volume_all = {
+        dates,
+        pools_live: live.length,
+        pools_unreported: unreported,
+        protocol_volume_24h_usd: rhea.volume_24h_usd,
+        all_pool_volume_last_day_usd: lastDay,
+        rows: rows.sort((x, y) => y.daily.reduce((a, v) => a + v, 0) - x.daily.reduce((a, v) => a + v, 0)),
+      };
+      rhea.volume_organic_share = h4Breakdown(pool_volume_all, rhea.clean_tvl_usd, compileRules(opts.thresholds).H4)?.share ?? null;
+      src(`${rheaUrls.poolVolumeBase} + ${RHEA_API}/get-dcl-pools-volume?pool_id=<id> (${live.length} live pools)`, pool_volume_all);
     }
   }
 
@@ -244,8 +258,8 @@ export async function buildSnapshot(opts: { thresholds: Thresholds; thresholdsSh
       aggregator_auth: aggregatorAuth(),
     },
     index: index.sort((a, b) => (a.rank ?? 1e9) - (b.rank ?? 1e9)),
-    series: { network, rhea_tvl, intents_txns, custody_constant, custody_constant_meta, h2_daily, flow_buckets, pool_volume },
-    incident: { date: opts.thresholds.claims.H6.incident_date!, sources: INCIDENT_SOURCES },
+    series: { network, rhea_tvl, intents_txns, custody_constant, custody_constant_meta, h2_daily, flow_buckets, pool_volume_all },
+    incident: { date: opts.thresholds.claims.H6.incident_date!, ...INCIDENT },
     sources,
     errors: [...errors, ...(m?.errors ?? []).map((message) => ({ step: "RHEA market", message }))],
   };

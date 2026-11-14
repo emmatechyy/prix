@@ -18,7 +18,7 @@ export const revalidate = 600;
 
 export default async function Overview() {
   const [idx, net, proto, custody, flows, stats] = await Promise.all([safe(getIndex), safe(getNetwork), safe(getProtocolHistory), safe(getIntentsCustody), safe(getIntentsFlows), safe(getStats)]);
-  const pub = getPublished();
+  const pub = await getPublished();
   const v = new Map(pub.verdicts.map((x) => [x.id, x]));
   const rh = pub.snapshot?.rhea;
 
@@ -269,7 +269,7 @@ const PILLARS: { title: string; text: string; claims: Verdict["id"][] }[] = [
   { title: "Capital", text: "Where NEAR's capital sits and whether fresh capital is still arriving.", claims: ["H2", "H5"] },
   { title: "Markets", text: "Whether orders of institutional size clear, and whether the volume is real.", claims: ["H3", "H4"] },
 ];
-const SHORT: Record<Verdict["id"], string> = { H1: "Usage independent of price", H2: "Capital sits in Intents", H3: "Markets absorb $100k", H4: "Volume is organic", H5: "Fresh capital entering", H6: "Recovered from exploit" };
+const SHORT: Record<Verdict["id"], string> = { H1: "Usage independent of price", H2: "Capital sits in Intents", H3: "Markets absorb $100k", H4: "Volume mostly organic", H5: "Fresh capital entering", H6: "Recovered from exploit" };
 function VerdictDot({ v }: { v: Verdict["verdict"] }) {
   const c = v === "Supported" ? "bg-up-fill text-up" : v === "Not supported" ? "bg-danger-fill text-danger" : v === "Mixed" ? "bg-warn-fill text-warn" : "bg-faint text-muted";
   return (

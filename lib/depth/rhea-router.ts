@@ -30,7 +30,7 @@ export async function getRheaDepth(m: Market, tokenIds: string[], { concurrency 
   const v1 = (
     await mapLimit(jobs, concurrency, async ({ token, size }): Promise<DepthRow> => {
       const t = m.tokens.get(token);
-      const base: Omit<DepthRow, "status"> = { route: "rhea-router", router: "smartrouter-v1", origin: t?.symbol ?? token, destination_token: USDC, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
+      const base: Omit<DepthRow, "status"> = { route: "rhea-router", router: "smartrouter-v1", router_version: "RHEA Smart Router V1 · findPath", app_fee_bps: null, origin: t?.symbol ?? token, destination_token: USDC, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
       if (!t || t.price == null || !usdc || usdc.price == null) return { ...base, status: "error", error: "token or USDC has no RHEA price" };
       const t0 = Date.now();
       try {
@@ -51,7 +51,7 @@ export async function getRheaDepth(m: Market, tokenIds: string[], { concurrency 
     const amm = m.pools.filter((p) => p.clean && p.kind === "AMM" && p.tokens.includes(token)).sort((a, b) => b.tvl - a.tvl)[0];
     const side = amm ? amm.sideUsd[amm.tokens.indexOf(token)] : null;
     for (const size of DEPTH_SIZES) {
-      const base: Omit<DepthRow, "status"> = { route: "rhea-router", router: amm ? `amm-math:${amm.id}` : "amm-math", origin: m.tokens.get(token)?.symbol ?? token, destination_token: amm ? amm.tokens.find((x) => x !== token) ?? USDC : USDC, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
+      const base: Omit<DepthRow, "status"> = { route: "rhea-router", router: amm ? `amm-math:${amm.id}` : "amm-math", router_version: "AMM reserve math (fallback, no router quote)", app_fee_bps: null, origin: m.tokens.get(token)?.symbol ?? token, destination_token: amm ? amm.tokens.find((x) => x !== token) ?? USDC : USDC, token_id: token, size_usd: size, amount_in_usd: null, amount_out_usd: null, fee_usd: null, relative_slippage: null, quote_ms: null, fetched_at };
       if (!amm || !side || side <= 0) rows.push({ ...base, status: "no-route", error: "no clean AMM pool with priced reserves" });
       else rows.push({ ...base, amount_in_usd: size, amount_out_usd: size * ammOutRatio(side, size, amm.fee), fee_usd: (size * amm.fee) / 10000, status: "ok" });
     }

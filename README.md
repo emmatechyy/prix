@@ -23,8 +23,8 @@ Holding a NEAR token means answering four questions. Can I exit without moving t
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm verdicts      # offline: verdicts H1–H6 from the latest data/snapshots/*.json (checks its sha256)
-pnpm verify        # online: refetch every source, rebuild in memory, diff against the published snapshot → PASS or the diff
+pnpm verdicts      # offline: verdicts H1–H6 from the newest bundled data/snapshots/*.json (checks its sha256)
+pnpm verify        # online: read the latest snapshot from the `data` branch (bundled copy if unreachable), refetch every source, rebuild in memory, diff → PASS or the diff
 ```
 
 `pnpm verdicts --snapshot data/snapshots/2026-11-13.json` pins a specific file. `pnpm verify --offline` skips the
@@ -107,7 +107,7 @@ cp .env.example .env.local   # optional: every variable is optional
 pnpm build && pnpm start     # http://localhost:3000
 pnpm test                    # vitest: engine fixtures, depth math, thresholds, hashing
 pnpm snapshot:daily          # build data/snapshots/<UTC date>.json (what the daily GitHub Action runs)
-pnpm flows                   # sample NEAR Intents flow buckets into data/history/
+pnpm flows                   # page NEAR Intents events back to the stored cursor (data/history/intents-flow-buckets.json)
 ```
 
 The first build pre-renders every page from live data, which takes about 1 minute on a cold cache. Pages then revalidate every 5–10 minutes.
@@ -128,7 +128,7 @@ No database is required.
 
 1. Import the repo into a Vercel project (framework: Next.js; defaults are fine).
 2. Optionally add `NEARBLOCKS_API_KEY` as a Sensitive environment variable for Production.
-3. Deploy. No database is needed. Snapshots are committed to `data/snapshots/` by the `daily snapshot` GitHub Action (00:20 UTC); the `intents flow buckets` Action samples flows every 30 minutes into `data/history/` (these commits skip the Vercel build via `vercel.json`'s `ignoreCommand`).
+3. Deploy. No database is needed. The workflow files live on `main` (scheduled workflows only run from the default branch) and commit data to the separate **`data` branch**: the `daily snapshot` Action (00:20 UTC) writes `data/snapshots/<date>.json` plus the manifest `data/snapshots/index.json`; the `intents flows` Action pages flows every 30 minutes and commits hourly (`data: <ISO time> [skip ci]`). `vercel.json`'s `ignoreCommand` skips every deploy for the `data` branch. The app reads the latest snapshot from `https://raw.githubusercontent.com/emmatechyy/prix/data/data/snapshots/` (revalidated every 30 minutes) and falls back to the newest snapshot bundled in `data/snapshots/` if the fetch fails or the hash does not match. Override with `PRIX_DATA_REPO`, `PRIX_DATA_BRANCH`, `PRIX_DATA_RAW_URL`; `PRIX_DATA_OFFLINE=1` uses only the bundled copy.
 
 ## Public API
 

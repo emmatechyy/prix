@@ -6,7 +6,7 @@ export const OPTIONS = options;
 
 /** RHEA TVL with and without the pools PRIX rejects, and why each was rejected. */
 export async function GET() {
-  const { snapshot, thresholds } = getPublished();
+  const { snapshot, thresholds } = await getPublished();
   if (!snapshot) return apiError(503, "no_snapshot", "No published snapshot yet.");
   const r = snapshot.rhea;
   return apiJson(

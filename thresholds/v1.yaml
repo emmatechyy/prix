@@ -44,6 +44,14 @@ claims:
   H4:
     text: Trading activity on RHEA is mostly organic.
     metric: volume from non-rejected, non-flagged pools / total reported volume, 30d
+    # Edited in place 2026-11-14 while DRAFT (see docs/threshold-diff.md, "Edits after review").
+    # Denominator = daily volume summed over ALL live pools (>= $1k TVL), rejected and flagged
+    # included; numerator = the part from pools that are neither rejected nor wash-flagged.
+    denominator: all live pools (>= $1k TVL), rejected and flagged included
+    wash_flags:
+      max_daily_turnover: 2.0       # pool's mean daily volume over the window / its TVL; above = flagged
+      concentration_min_share: 0.10 # pool's share of all-pool volume ...
+      concentration_tvl_multiple: 5 # ... that is also > 5x its share of clean (non-rejected) TVL = flagged
     supported: ">= 80%"
     not_supported: "< 60%"
     else: Mixed
@@ -54,6 +62,9 @@ claims:
     metric: net Intents flow (deposits - withdrawals), 7d and 30d, plus 30d TVL change
     supported: "30d net > 0 AND 7d net > 0 AND 30d clean TVL change > 0"
     not_supported: "30d net < 0 AND 7d net < 0"
+    # Edited in place 2026-11-14 while DRAFT: share of window hours actually observed by the
+    # contiguous event pages. Below this, the verdict is Insufficient data. No extrapolation.
+    min_coverage: 0.80
     else: Mixed
     grade: B
 
