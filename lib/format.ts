@@ -1,4 +1,4 @@
-export const NR = "not reported";
+export const NR = "Not reported";
 
 export function usd(v: number | null | undefined, opts: { compact?: boolean; digits?: number } = {}): string {
   if (v == null || !Number.isFinite(v)) return NR;
@@ -75,3 +75,6 @@ export const explorer = {
   receipt: (id: string) => `https://nearblocks.io/?q=${id}`,
   rheaPool: (id: string) => (id.includes("|") ? `https://app.rhea.finance/poolV2/${id.replace(/\|/g, "@")}` : `https://app.rhea.finance/pool/${id}`),
 };
+
+/** Request time for server-rendered freshness lines (ISR re-renders every few minutes). */
+export const nowMs = () => Date.now();

@@ -4,61 +4,54 @@ import Link from "next/link";
 import { SiteNav } from "@/components/nav";
 import "./globals.css";
 
-const hostGrotesk = Host_Grotesk({ variable: "--font-host-grotesk", subsets: ["latin"] });
-const instrumentSerif = Instrument_Serif({ variable: "--font-instrument-serif", subsets: ["latin"], weight: "400" });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const hostGrotesk = Host_Grotesk({ variable: "--font-host-grotesk", subsets: ["latin"], display: "swap" });
+const instrumentSerif = Instrument_Serif({ variable: "--font-instrument-serif", subsets: ["latin"], weight: "400", display: "swap" });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "PRIX — Evidence-graded index of NEAR on-chain markets", template: "%s · PRIX" },
-  description:
-    "PRIX reads RHEA pools, NEAR Intents and NEAR network data and turns them into transparent, re-runnable investment signals: liquidity depth, flows, whale moves, launches and a ranked index with every input shown.",
+  metadataBase: new URL("https://prix-orcin.vercel.app"),
+  title: { default: "PRIX: the long-term case for NEAR, tested daily", template: "%s · PRIX" },
+  description: "An evidence-graded index of NEAR on-chain markets with a falsifiable investment thesis. Six pre-registered claims, one hashed daily snapshot, every number linked to its source.",
+  openGraph: { images: ["/og"] },
+  twitter: { card: "summary_large_image", images: ["/og"] },
 };
 
-export const viewport: Viewport = { themeColor: "#e7ecf3", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#e7ecf3" };
 
 const FOOT = [
-  ["Index", "/rankings"],
-  ["Thesis", "/thesis"],
-  ["Depth", "/depth"],
-  ["Methodology", "/methodology"],
-  ["JSON API", "/api/v1/openapi.json"],
-  ["Feed", "/feed.xml"],
+  ["Method", "/method"],
+  ["API", "/api/v1/openapi.json"],
+  ["Repo", "https://github.com/emmatechyy/prix"],
+  ["Data sources", "/method#sources"],
 ] as const;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${hostGrotesk.variable} ${instrumentSerif.variable} ${geistMono.variable} antialiased`}>
       <body className="min-h-dvh">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-paper">
           Skip to content
         </a>
-        <span id="top" />
         <SiteNav />
         <main id="main" className="mx-auto w-full max-w-[1200px] px-4 pt-12 pb-16 sm:px-8 sm:pt-16 lg:px-10">
           {children}
         </main>
-        <footer className="mx-auto w-full max-w-[1200px] px-4 sm:px-8 lg:px-10">
-          <div className="appear py-16 text-center sm:py-24">
-            <p className="text-[17px] text-muted">Read-only. No wallet, no trading, no custody.</p>
-            <p className="display mx-auto mt-4 max-w-[14ch] text-[44px] text-text sm:text-[72px]">Every figure links to its source.</p>
-            <p className="mx-auto mt-5 max-w-xl text-[17px] leading-[1.55] text-muted">
-              Missing data is shown as <span className="text-text">“not reported”</span>, never estimated. Data: RHEA indexer &amp; Smart Router, NEAR RPC, FastNEAR, NearBlocks v3, NEAR Intents 1Click.
-            </p>
-            <Link href="/methodology" className="mt-8 inline-block rounded-full bg-accent px-7 py-4 text-[16px] leading-5 font-medium text-on-accent transition-colors duration-300 hover:bg-accent-hover">
-              Read the methodology
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-4 border-t border-border-strong py-6 text-[15px] text-muted sm:flex-row sm:justify-between">
-            <p className="text-center sm:text-left">Built for NEAR HACKATHON 2026 · Investment Thesis track</p>
-            <ul className="flex flex-wrap justify-center gap-x-5 gap-y-1">
+        <footer className="mx-auto w-full max-w-[1200px] px-4 pb-28 sm:px-8 lg:px-10 min-[900px]:pb-10">
+          <div className="flex flex-col items-center gap-3 border-t border-rule-strong pt-6 text-[15px] text-slate sm:flex-row sm:justify-between">
+            <p className="text-center sm:text-left">Read-only. No wallet, no trading, no custody.</p>
+            <ul className="flex flex-wrap justify-center gap-x-1">
               {FOOT.map(([l, h]) => (
                 <li key={h}>
-                  <Link href={h} className="hover:text-text">{l}</Link>
+                  <Link href={h} className="inline-flex min-h-11 items-center px-2.5 text-ink hover:underline">
+                    {l}
+                  </Link>
                 </li>
               ))}
             </ul>
-            <a href="#top" className="text-text underline underline-offset-4 hover:text-accent-hover">Back to top</a>
           </div>
+          <p className="mx-auto mt-2 max-w-[68ch] text-center text-[13px] leading-relaxed text-slate sm:text-left sm:mx-0">
+            PRIX has no commercial relationship with RHEA or NEAR Intents. RHEA is both a data source and a subject, so its numbers are recomputed, not trusted. Built for the NEAR Hackathon 2026, Investment Thesis track.
+          </p>
         </footer>
       </body>
     </html>

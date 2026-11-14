@@ -1,35 +1,49 @@
 @import "tailwindcss";
 
 /*
-  Design tokens. Visual language adapted from a light editorial template:
-  cool paper background, a single cobalt ink, serif display type over a grotesk text face,
-  pill controls, soft 16–20px cards with no hard borders, and blur-up appear motion.
+  PRIX design tokens, after the Broadcast Framer template: cool paper, one cobalt ink, Instrument Serif
+  display over Host Grotesk text, Geist Mono figures, pill controls, soft borderless 20px cards.
+  Colour means evidence: verdict colours are the only strong colour besides cobalt, and every verdict
+  also carries an icon and a word. Light only (a dark theme fought the template).
 */
 :root {
-  --bg: #e7ecf3; /* paper */
-  --surface: #f6f8fc; /* card */
-  --surface-2: #fbfcfe; /* raised / hover */
-  --tint: rgba(42, 63, 214, 0.08); /* cobalt wash, chips & answer bubbles */
+  --ink: #2a3fd6; /* cobalt: headings, copy, controls */
+  --heat-deep: #182280; /* dark end of the depth heat map only (paper text on it stays AA) */
+  --deep: #16218a; /* deep cobalt: dense figures in tables */
+  --slate: #4f5fc2; /* secondary copy (AA on paper and cards) */
+  --paper: #e7ecf3;
+  --surface: #f6f8fc;
+  --rule: #cdd4ef;
+  --rule-strong: #aab5e6;
+  --wash: rgba(42, 63, 214, 0.08);
+  --supported: #0f7b5f;
+  --mixed: #a66a0b;
+  --not-supported: #b3382c;
+  --no-data: #6b7686;
+
+  --bg: var(--paper);
+  --surface-2: #fbfcfe;
+  --tint: var(--wash);
   --tint-strong: rgba(42, 63, 214, 0.14);
-  --border: rgba(42, 63, 214, 0.12); /* hairline */
-  --border-strong: rgba(42, 63, 214, 0.28);
-  --text: #2a3fd6; /* cobalt ink: headings, values */
-  --ink: #16218a; /* deep cobalt: dense numeric data */
-  --muted: #4f5fc2; /* secondary copy */
-  --faint: #5865bd; /* tertiary (≥4.5:1 on cards) */
-  --accent: #2a3fd6;
+  --border: var(--rule);
+  --border-strong: var(--rule-strong);
+  --text: var(--ink);
+  --muted: var(--slate);
+  --faint: var(--slate);
+  --accent: var(--ink);
   --accent-hover: #2234bb;
-  --on-accent: #e7ecf3;
+  --on-accent: var(--paper);
   --periwinkle: #c9d0f0;
-  --up: #157a46;
-  --up-fill: #1e9e5a;
-  --warn: #8a5a00;
-  --warn-fill: #f1e4a6;
-  --danger: #b42a36;
-  --danger-fill: #ff6b6b;
+  --up: var(--supported);
+  --up-fill: var(--supported);
+  --warn: var(--mixed);
+  --warn-fill: rgba(166, 106, 11, 0.14);
+  --danger: var(--not-supported);
+  --danger-fill: var(--not-supported);
   --shadow-pill: 0 8px 24px rgba(42, 63, 214, 0.1);
   --shadow-float: 0 24px 48px rgba(12, 20, 90, 0.18);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: light;
 }
 
 @theme inline {
@@ -55,6 +69,15 @@
   --color-warn-fill: var(--warn-fill);
   --color-danger: var(--danger);
   --color-danger-fill: var(--danger-fill);
+  --color-slate: var(--slate);
+  --color-deep: var(--deep);
+  --color-wash: var(--wash);
+  --color-paper: var(--paper);
+  --color-rule: var(--rule);
+  --color-supported: var(--supported);
+  --color-mixed: var(--mixed);
+  --color-not-supported: var(--not-supported);
+  --color-no-data: var(--no-data);
   --font-sans: var(--font-host-grotesk);
   --font-serif: var(--font-instrument-serif);
   --font-mono: var(--font-geist-mono);
@@ -66,26 +89,22 @@
 }
 
 html {
-  color-scheme: light;
-  background: var(--bg);
+  background: var(--paper);
   scroll-behavior: smooth;
 }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
-  font-size: 15px;
-  line-height: 1.45;
-  overflow-x: clip; /* full-bleed bands use 100vw */
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-host-grotesk), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: clip;
 }
-.font-serif {
-  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
-  font-weight: 400;
-}
+.font-serif,
 .display {
-  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  font-family: var(--font-instrument-serif), Georgia, serif;
   font-weight: 400;
-  line-height: 0.98;
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 .num {
@@ -100,9 +119,16 @@ a {
   text-underline-offset: 3px;
 }
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
   border-radius: 6px;
+}
+.measure {
+  max-width: 68ch;
+}
+/* Hatch used wherever data is missing (no-data verdicts, failed depth cells). */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--no-data) 35%, transparent) 4px 5px);
 }
 .scroll-x {
   overflow-x: auto;
@@ -115,7 +141,8 @@ table.data {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13.5px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
 }
 table.data th {
   position: sticky;
@@ -123,7 +150,7 @@ table.data th {
   background: var(--surface);
   color: var(--muted);
   font-weight: 500;
-  font-size: 12.5px;
+  font-size: 13px;
   text-align: left;
   padding: 10px 14px;
   border-bottom: 1px solid var(--border-strong);
@@ -134,7 +161,7 @@ table.data td {
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
   vertical-align: middle;
-  color: var(--ink);
+  color: var(--deep);
 }
 table.data th:first-child,
 table.data td:first-child {
@@ -157,27 +184,15 @@ table.data .r {
   text-align: right;
 }
 
-/* Appear motion: blur-up, as in the reference (0.7s, cubic-bezier(.23,1,.32,1), 14px rise, 4px blur). */
-@keyframes appear {
+/* The only entrance animation on the site: threshold-rail markers slide in once (spec §5.2). */
+@keyframes rail-in {
   from {
-    opacity: 0.001;
-    transform: translateY(14px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
+    left: 0;
   }
 }
-.appear {
-  animation: appear 0.7s var(--ease-out) both;
+.rail-marker {
+  animation: rail-in 600ms ease-out both;
 }
-.appear-1 { animation-delay: 0.06s; }
-.appear-2 { animation-delay: 0.12s; }
-.appear-3 { animation-delay: 0.18s; }
-.appear-4 { animation-delay: 0.24s; }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
