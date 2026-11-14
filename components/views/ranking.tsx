@@ -78,7 +78,7 @@ export async function RankingView({ showLow = false, sort: sortParam }: { showLo
           {high.length} measured · low confidence = liquidity under {usd(idx.v.rules.min_liquidity_usd)}, cost to trade $10k over {(idx.v.rules.max_price_impact_10k * 100).toFixed(0)}%, or no measured depth
         </span>
       </div>
-      <div className="scroll-x max-h-[75vh] rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x max-h-[75vh] rounded-lg border border-rule bg-surface">
         <table className="data">
           <caption className="sr-only">Tokens ranked by PRIX score, sorted by {S.label.toLowerCase()}</caption>
           <thead>

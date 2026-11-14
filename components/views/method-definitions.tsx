@@ -34,11 +34,11 @@ export function MethodDefinitions({ th }: { th: ReturnType<typeof loadThresholds
         <Section id="integrity" title="2. Integrity rules — what PRIX refuses to count">
           <p>PRIX recomputes every pool&apos;s value as <code>Σ reserve × RHEA price</code> from on-chain reserves (AMM reserves from the RHEA indexer, DCL reserves read directly from <code>dclv2.ref-labs.near</code>). A pool is excluded from every metric if any rule trips:</p>
           <ul>
-            <li><strong>unpriced-side</strong> — one token has no RHEA price.</li>
-            <li><strong>price-imbalance</strong> — a constant-product (50/50) pool whose two sides differ by more than 3×. Equal value is an invariant of these pools, so a gap means one price is wrong.</li>
-            <li><strong>unanchored-pair</strong> — neither side is a base asset (NEAR, stablecoins, liquid-staked NEAR, curated bridged majors). Two thinly traded tokens can price each other at any level.</li>
-            <li><strong>exceeds-protocol-tvl</strong> — a single pool claims more than 50% of RHEA&apos;s whole reported TVL.</li>
-            <li><strong>dust</strong> — pools under $1,000 are ignored (not rejected).</li>
+            <li><strong>One side of the pool has no price</strong> — one token has no RHEA price.</li>
+            <li><strong>The two sides differ in value by more than 3×</strong> — a constant-product (50/50) pool whose two sides differ by more than 3×. Equal value is an invariant of these pools, so a gap means one price is wrong.</li>
+            <li><strong>Priced against a token with no reliable price</strong> — neither side is a base asset (NEAR, stablecoins, liquid-staked NEAR, curated bridged majors). Two thinly traded tokens can price each other at any level.</li>
+            <li><strong>Claims more than half of RHEA’s whole TVL</strong> — a single pool claims more than 50% of RHEA&apos;s whole reported TVL.</li>
+            <li><strong>Under $1,000 of liquidity</strong> — pools under $1,000 are ignored (not rejected).</li>
           </ul>
           <p>Prices are cross-checked against NEAR Intents 1Click; gaps above 5% are flagged. Protocol TVL history drops days above 3× the 90-day median. Intents custody drops any asset worth more than 10× the next one.</p>
         </Section>
@@ -60,7 +60,7 @@ export function MethodDefinitions({ th }: { th: ReturnType<typeof loadThresholds
             <li><strong>Volume spike</strong> — 7-day average daily volume more than 2× the prior 30-day average.</li>
             <li><strong>Whale</strong> — any swap or liquidity move ≥ ${WHALE_USD.toLocaleString()}, sampled from the latest 50 swaps in the 16 busiest verified pools and the latest liquidity events in the 14 deepest. Swap size uses the smaller leg. The 18 largest swaps and 20 newest LP moves are traced receipt → transaction → signer.</li>
             <li><strong>Intents flows</strong> — intents.near token events from NearBlocks, paged newest-first with a stored cursor: each run pages back from now to the newest instant already read, and unread stretches are kept as gaps that later runs resume. MINT = deposit, BURN = withdrawal, valued at the price recorded on each event. <strong>Coverage</strong> = hours of the window actually read ÷ hours in the window; H5 needs ≥ {(th.t.claims.H5.min_coverage * 100).toFixed(0)}% of both the 7d and 30d windows before it gives any verdict. Nothing is scaled up to cover what was not read.</li>
-            <li><strong>H4 volume from verified pools</strong> — numerator: 30-day volume of pools that are not rejected and not wash-flagged; denominator: 30-day volume of <em>every</em> live pool (≥ $1k TVL), rejected and flagged included. Wash flags: mean daily volume above {th.t.claims.H4.wash_flags.max_daily_turnover}× the pool&apos;s TVL, or ≥ {(th.t.claims.H4.wash_flags.concentration_min_share * 100).toFixed(0)}% of all volume while more than {th.t.claims.H4.wash_flags.concentration_tvl_multiple}× its share of clean TVL. These are signals, not proof: concentrated-liquidity pools turn over their TVL faster by design.</li>
+            <li><strong>H4 volume from verified pools</strong> — numerator: 30-day volume of pools that are not rejected and not wash-flagged; denominator: 30-day volume of <em>every</em> live pool (≥ $1k TVL), rejected and flagged included. Wash flags: mean daily volume above {th.t.claims.H4.wash_flags.max_daily_turnover}× the pool&apos;s TVL, or ≥ {(th.t.claims.H4.wash_flags.concentration_min_share * 100).toFixed(0)}% of all volume while more than {th.t.claims.H4.wash_flags.concentration_tvl_multiple}× its share of TVL (verified pools). These are signals, not proof: concentrated-liquidity pools turn over their TVL faster by design.</li>
           </ul>
         </Section>
 

@@ -39,3 +39,11 @@ describe("threshold rail model", () => {
     expect(flagText("unanchored-pair")).toBe("Priced against a token with no reliable price");
   });
 });
+
+import { heat } from "../lib/depth/matrix";
+describe("depth heat", () => {
+  it("keeps a gap between the light and dark bands", () => {
+    for (const s of [0.002, 0.01, 0.029]) expect(heat(s)).toBeLessThanOrEqual(30);
+    for (const s of [0.033, 0.1, 1]) expect(heat(s)).toBeGreaterThanOrEqual(62);
+  });
+});

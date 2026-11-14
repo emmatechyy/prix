@@ -61,7 +61,7 @@ export function CostChart({ rows, token, symbol, date }: { rows: DepthRow[]; tok
       </figcaption>
       <details className="mt-2">
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-[15px] font-medium text-ink">View as table</summary>
-        <div className="scroll-x rounded-lg border border-rule">
+        <div tabIndex={0} className="scroll-x rounded-lg border border-rule">
           <table className="data">
             <caption className="sr-only">Cost to trade {symbol} by size and route</caption>
             <thead>

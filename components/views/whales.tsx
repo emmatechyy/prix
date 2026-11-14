@@ -41,7 +41,7 @@ export async function WhalesView() {
           <Card>
             <CardHeader title={`Whale swaps (${w.v.swaps.length})`} subtitle="USD value uses the smaller of the two legs, so a mispriced token cannot inflate the size." />
             {w.v.swaps.length ? (
-              <div className="scroll-x">
+              <div tabIndex={0} className="scroll-x">
                 <table className="data">
                   <thead><tr><th>When</th><th>Sold → Bought</th><th className="r">Size</th><th>Signer</th><th>Transaction</th><th>Pool</th></tr></thead>
                   <tbody>
@@ -67,7 +67,7 @@ export async function WhalesView() {
             <Card>
               <CardHeader title={`Large liquidity moves (${w.v.lps.length})`} subtitle="Adds and removals of liquidity in the deepest verified pools, newest first." />
               {w.v.lps.length ? (
-                <div className="scroll-x">
+                <div tabIndex={0} className="scroll-x">
                   <table className="data">
                     <thead><tr><th>When</th><th>Action</th><th>Pool</th><th className="r">Value</th><th>Signer</th><th>Tx</th></tr></thead>
                     <tbody>
@@ -91,7 +91,7 @@ export async function WhalesView() {
             <Card>
               <CardHeader title="Most active large accounts" subtitle="Only events traced to a signer are counted." />
               {w.v.accounts.length ? (
-                <div className="scroll-x">
+                <div tabIndex={0} className="scroll-x">
                   <table className="data">
                     <thead><tr><th>Account</th><th className="r">Swapped</th><th className="r">LP added</th><th className="r">LP removed</th><th className="r">Events</th></tr></thead>
                     <tbody>

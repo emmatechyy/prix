@@ -3,7 +3,7 @@ import { NoSnapshot, snapshotApi } from "@/components/snapshot-ui";
 import { SegmentedControl } from "@/components/segmented";
 import { getPublished } from "@/lib/server/published";
 import { DEPTH_SIZES } from "@/lib/depth/slippage";
-import { cellFor, heat, type Cell, type RouteView } from "@/lib/depth/matrix";
+import { cellFor, heat, HEAT_DARK_TEXT_FROM, type Cell, type RouteView } from "@/lib/depth/matrix";
 import { utc } from "@/lib/format";
 
 const sizeLabel = (n: number) => (n >= 1e6 ? `$${n / 1e6}M` : `$${n / 1e3}k`);
@@ -19,7 +19,7 @@ function CellView({ c, token, size }: { c: Cell; token: string; size: number }) 
     <details className="group relative">
       <summary
         className={`flex min-h-11 min-w-[84px] cursor-pointer list-none items-center justify-end rounded px-2 text-[15px] [&::-webkit-details-marker]:hidden ${c.kind === "status" ? "hatch text-[13px] text-ink" : "num"}`}
-        style={c.kind === "value" ? { background: `color-mix(in srgb, var(--ink) ${h}%, var(--surface))`, color: h > 34 ? "var(--paper)" : "var(--ink)" } : undefined}
+        style={c.kind === "value" ? { background: `color-mix(in srgb, var(--ink) ${h}%, var(--surface))`, color: h >= HEAT_DARK_TEXT_FROM ? "var(--paper)" : "var(--ink)" } : undefined}
         aria-label={`${token} at ${sizeLabel(size)}: ${c.kind === "value" ? (c.baseline ? "baseline quote" : `${pct} slippage`) : c.label}. Show quote details`}
       >
         {pct}
@@ -70,7 +70,7 @@ export async function DepthView({ route = "best" }: { route?: RouteView }) {
           items={(["intents", "rhea", "best"] as const).map((k) => ({ key: k, label: k === "best" ? "Best" : k === "intents" ? "Intents" : "RHEA", href: `/capital?route=${k}#depth` }))}
         />
       </div>
-      <div className="scroll-x rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
         <table className="data [&_td:first-child]:sticky [&_td:first-child]:left-0 [&_td:first-child]:z-10 [&_td:first-child]:bg-surface [&_th:first-child]:left-0 [&_th:first-child]:z-20">
           <caption className="sr-only">Relative slippage by token and order size, {ROUTE_LABEL[route]}</caption>
           <thead>
@@ -102,7 +102,7 @@ export async function DepthView({ route = "best" }: { route?: RouteView }) {
         </table>
       </div>
       <p className="mt-2 text-[13px] text-slate">
-        Darker = costlier. Hatched cells had no usable quote. Tap a cell for the route, fee, quote time and fetch time. Raw rows:{" "}
+        Darker = costlier (under 3% light, 3% and over dark). Hatched cells had no usable quote. Tap a cell for the route, fee, quote time and fetch time. Raw rows:{" "}
         <a href="/api/v1/depth" className="text-ink underline underline-offset-4">
           /api/v1/depth
         </a>

@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const PILLAR_NAME: Record<Pillar, string> = { depth: "Depth", activity: "Activity", distribution: "Distribution", flow: "Flow" };
 
 function fmtInput(label: string, v: string | number | null) {
-  if (v == null) return <span className="text-faint">not reported</span>;
+  if (v == null) return <span className="text-faint">Not reported</span>;
   if (typeof v === "string") return v;
   if (/\(USD\)/.test(label)) return usd(v);
   if (/share|impact|change|pressure|Turnover|vs prior|Round-trip/i.test(label)) return /Turnover/.test(label) ? `${v.toFixed(2)}×` : pct(v, 2);
@@ -132,7 +132,7 @@ export default async function TokenPage({ params }: Props) {
             <Card>
               <CardHeader title="Top holders" subtitle={r.holders.top10Share != null ? `Top-10 non-custody accounts hold ${pct(r.holders.top10Share, 1)} of float. Custody contracts hold ${pct(r.holders.custodyShare, 1)} of supply.` : "Holder data not reported."} right={r.holders.source ? <SourceLink href={r.holders.source} compact /> : undefined} />
               {r.holders.top.length ? (
-                <div className="scroll-x max-h-[340px]">
+                <div tabIndex={0} className="scroll-x max-h-[340px]">
                   <table className="data">
                     <thead><tr><th>Account</th><th>Type</th><th className="r">Supply</th></tr></thead>
                     <tbody>
@@ -155,8 +155,8 @@ export default async function TokenPage({ params }: Props) {
       )}
 
       <Card className="mt-4">
-        <CardHeader title={`RHEA pools containing ${t.symbol}`} subtitle="Largest 20 by PRIX-computed value. Rejected pools are shown with the reason." />
-        <div className="scroll-x">
+        <CardHeader title={`RHEA pools containing ${t.symbol}`} subtitle="Largest 20 by PRIX-computed value. Pools we didn’t count are shown with the reason." />
+        <div tabIndex={0} className="scroll-x">
           <table className="data">
             <thead><tr><th>Pool</th><th>Type</th><th>Pair</th><th className="r">Value</th><th className="r">24h volume</th><th>Status</th></tr></thead>
             <tbody>
@@ -166,7 +166,7 @@ export default async function TokenPage({ params }: Props) {
                   <td><Badge>{p.kind}</Badge></td>
                   <td>{p.symbols.join(" / ")}</td>
                   <td className="r num">{usd(p.tvl)}</td>
-                  <td className="r num">{p.volume24h == null ? <span className="text-faint">not reported</span> : usd(p.volume24h)}</td>
+                  <td className="r num">{p.volume24h == null ? <span className="text-faint">Not reported</span> : usd(p.volume24h)}</td>
                   <td>{p.clean ? (p.flags.includes("dust") ? <Badge>dust &lt;$1k</Badge> : <Badge tone="up">verified</Badge>) : <Flags flags={p.flags} max={2} />}</td>
                 </tr>
               ))}

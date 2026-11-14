@@ -80,7 +80,7 @@ export default async function Method() {
             what changed from earlier rules
           </a>
         </p>
-        <div className="scroll-x rounded-lg border border-rule bg-surface">
+        <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
           <table className="data">
             <caption className="sr-only">Pre-registered thresholds for each claim</caption>
             <thead>
@@ -130,7 +130,7 @@ export default async function Method() {
 
       <section aria-labelledby="sources" className="grid min-w-0 gap-3 [&>*]:min-w-0">
         <H2 id="sources">Data sources</H2>
-        <div className="scroll-x rounded-lg border border-rule bg-surface">
+        <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
           <table className="data">
             <caption className="sr-only">Data sources and when the published snapshot last fetched them</caption>
             <thead>

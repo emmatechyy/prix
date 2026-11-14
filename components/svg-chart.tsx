@@ -53,7 +53,7 @@ export function LineChart({
   });
   const color = (i: number) => (i === 0 ? "var(--ink)" : "var(--slate)");
   const ax = annotate && dates.includes(annotate.date) ? x(annotate.date) : null;
-  const summary = scaled.map((s) => `${s.l.name}: latest ${s.last ? s.l.format(s.last.value!) : "not reported"}, range ${s.l.format(s.lo)} to ${s.l.format(s.hi)}`).join("; ");
+  const summary = scaled.map((s) => `${s.l.name}: latest ${s.last ? s.l.format(s.last.value!) : "Not reported"}, range ${s.l.format(s.lo)} to ${s.l.format(s.hi)}`).join("; ");
   return (
     <figure className="m-0">
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`${title}, ${dates[0]} to ${dates.at(-1)}. ${summary}.`}>
@@ -84,7 +84,7 @@ export function LineChart({
             <svg width="18" height="6" aria-hidden>
               <line x1="0" x2="18" y1="3" y2="3" stroke={color(s.i)} strokeWidth="2" strokeDasharray={s.i === 0 ? undefined : "5 3"} />
             </svg>
-            <span className="text-ink">{s.l.name}</span> <span className="num">{s.last ? `${s.l.format(s.last.value!)} on ${s.last.date}` : "not reported"}</span>
+            <span className="text-ink">{s.l.name}</span> <span className="num">{s.last ? `${s.l.format(s.last.value!)} on ${s.last.date}` : "Not reported"}</span>
           </span>
         ))}
         {annotate && (
@@ -96,7 +96,7 @@ export function LineChart({
       {note && <p className="mt-1 text-[13px] text-slate">{note}</p>}
       <details className="mt-2">
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-[15px] font-medium text-ink">View as table</summary>
-        <div className="scroll-x mt-1 max-h-[320px] overflow-y-auto rounded-lg border border-rule">
+        <div tabIndex={0} className="scroll-x mt-1 max-h-[320px] overflow-y-auto rounded-lg border border-rule">
           <table className="data">
             <caption className="sr-only">{title}</caption>
             <thead>

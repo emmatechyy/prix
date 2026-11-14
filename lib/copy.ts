@@ -18,6 +18,8 @@ const TERMS: [RegExp, string][] = [
   [/\bclean TVL\b/gi, "TVL (verified pools)"],
   [/\brejected pools\b/gi, "pools we didn't count"],
   [/\bunanchored-pair\b/g, "Priced against a token with no reliable price"],
+  [/\bno-route\b/g, "no route"],
+  [/\bnot-configured\b/g, "not configured"],
 ];
 
 /** Apply the terms table to a string from the engine or the snapshot. */

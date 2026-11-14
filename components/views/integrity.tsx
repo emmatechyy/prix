@@ -11,7 +11,7 @@ export function IntegrityView({ s }: { s: Snapshot }) {
   const top = pools.slice(0, 25);
   return (
     <div className="grid gap-4">
-      <div className="scroll-x rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
         <table className="data">
           <caption className="sr-only">RHEA TVL with and without the pools PRIX did not count</caption>
           <tbody>
@@ -39,7 +39,7 @@ export function IntegrityView({ s }: { s: Snapshot }) {
         </a>
         . <Link href="/method#integrity" className="text-ink underline underline-offset-4">The rules</Link>.
       </p>
-      <div className="scroll-x rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
         <table className="data">
           <caption className="sr-only">Largest pools PRIX did not count, with the reason</caption>
           <thead>

@@ -7,7 +7,7 @@ export function CopyCommand({ text, label = "Copy", mono = true }: { text: strin
   const [done, setDone] = useState(false);
   return (
     <div className="flex min-w-0 items-stretch overflow-hidden rounded-lg border border-rule bg-paper">
-      <code className={`min-w-0 flex-1 overflow-x-auto px-3 py-2.5 text-[13px] leading-6 whitespace-nowrap text-ink ${mono ? "font-mono" : ""}`}>{text}</code>
+      <code tabIndex={0} className={`min-w-0 flex-1 overflow-x-auto px-3 py-2.5 text-[13px] leading-6 whitespace-nowrap text-ink ${mono ? "font-mono" : ""}`}>{text}</code>
       <button
         type="button"
         onClick={() => {

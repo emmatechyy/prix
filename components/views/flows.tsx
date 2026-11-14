@@ -15,7 +15,7 @@ import { getLending, LENDING_SOURCE } from "@/lib/rhea/lending";
 
 
 function mins(ms: number | null | undefined) {
-  if (ms == null) return "not reported";
+  if (ms == null) return "Not reported";
   const m = ms / 60000;
   return m < 90 ? `${Math.max(1, Math.round(m))} min` : m < 2880 ? `${(m / 60).toFixed(1)} h` : `${(m / 1440).toFixed(1)} d`;
 }
@@ -45,7 +45,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
         <Card>
           <CardHeader title="Liquidity by sector (RHEA, clean pools)" subtitle="Value of each side of every verified pool, attributed to its token's sector. Pool volume is split 50/50 between its two sides." />
           {sectors ? (
-            <div className="scroll-x">
+            <div tabIndex={0} className="scroll-x">
               <table className="data">
                 <thead><tr><th>Sector</th><th className="r">Liquidity</th><th className="r">Share</th><th className="r">24h volume</th><th className="r">Tokens</th></tr></thead>
                 <tbody>
@@ -75,7 +75,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
         <Card>
           <CardHeader title="Token buy/sell pressure — latest 50 swaps in each token's deepest pool" subtitle="Net = USD bought − USD sold. Pressure = net ÷ total. The window is how long those 50 swaps took." />
           {tokenFlows.length ? (
-            <div className="scroll-x">
+            <div tabIndex={0} className="scroll-x">
               <table className="data">
                 <thead><tr><th>Token</th><th className="r">Bought</th><th className="r">Sold</th><th className="r">Net</th><th className="r">Pressure</th><th className="r">Window</th><th className="r">Pool TVL 7d</th></tr></thead>
                 <tbody>
@@ -107,7 +107,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
           />
           {flows.ok ? (
             flows.v.rows.length ? (
-              <div className="scroll-x">
+              <div tabIndex={0} className="scroll-x">
                 <table className="data">
                   <thead><tr><th>Asset</th><th>Origin</th><th className="r">Deposits</th><th className="r">Withdrawals</th><th className="r">Net</th><th className="r">Events</th></tr></thead>
                   <tbody>
@@ -136,7 +136,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
         <Card>
           <CardHeader title="Assets held by NEAR Intents (intents.near)" subtitle={custody.ok ? `${custody.v.rows.length} priced of ${custody.v.tokenCount} token contracts; ${custody.v.unpriced} non-zero balances have no RHEA price and are excluded.` : undefined} right={custody.ok ? <span className="num text-text">{usd(custody.v.total)}</span> : undefined} />
           {custody.ok ? (
-            <div className="scroll-x">
+            <div tabIndex={0} className="scroll-x">
               <table className="data">
                 <thead><tr><th>Asset</th><th>Sector</th><th className="r">Amount</th><th className="r">Value</th><th className="r">Share</th></tr></thead>
                 <tbody>
@@ -161,18 +161,18 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
         <Card>
           <CardHeader title="Fundamentals: RHEA Lending" subtitle="Supplied and borrowed balances per asset on RHEA Lending (Burrow), read with the RHEA cross-chain SDK's read-only batchViews(). Utilization = borrowed ÷ supplied. APRs are as reported by the contract. USD at RHEA prices; unpriced assets show not reported." right={lending.ok ? `${usd(lending.v.supplied_usd)} supplied · ${usd(lending.v.borrowed_usd)} borrowed` : undefined} />
           {lending.ok ? (
-            <div className="scroll-x">
+            <div tabIndex={0} className="scroll-x">
               <table className="data">
                 <thead><tr><th>Asset</th><th className="r">Supplied</th><th className="r">Borrowed</th><th className="r">Utilization</th><th className="r">Supply APR</th><th className="r">Borrow APR</th></tr></thead>
                 <tbody>
                   {lending.v.rows.filter((r) => (r.supplied_usd ?? 0) >= 1000 || r.supplied_usd == null).slice(0, 14).map((r) => (
                     <tr key={r.token_id}>
                       <td><TokenLink id={r.token_id} symbol={r.symbol} /></td>
-                      <td className="r num">{r.supplied_usd == null ? <span className="text-faint">not reported</span> : usd(r.supplied_usd)}</td>
-                      <td className="r num">{r.borrowed_usd == null ? <span className="text-faint">not reported</span> : usd(r.borrowed_usd)}</td>
-                      <td className="r num">{r.utilization == null ? <span className="text-faint">not reported</span> : pct(r.utilization, 1)}</td>
-                      <td className="r num">{r.supply_apr == null ? <span className="text-faint">not reported</span> : pct(r.supply_apr, 2)}</td>
-                      <td className="r num">{r.borrow_apr == null || !r.can_borrow ? <span className="text-faint">{r.can_borrow ? "not reported" : "not borrowable"}</span> : pct(r.borrow_apr, 2)}</td>
+                      <td className="r num">{r.supplied_usd == null ? <span className="text-faint">Not reported</span> : usd(r.supplied_usd)}</td>
+                      <td className="r num">{r.borrowed_usd == null ? <span className="text-faint">Not reported</span> : usd(r.borrowed_usd)}</td>
+                      <td className="r num">{r.utilization == null ? <span className="text-faint">Not reported</span> : pct(r.utilization, 1)}</td>
+                      <td className="r num">{r.supply_apr == null ? <span className="text-faint">Not reported</span> : pct(r.supply_apr, 2)}</td>
+                      <td className="r num">{r.borrow_apr == null || !r.can_borrow ? <span className="text-faint">{r.can_borrow ? "Not reported" : "not borrowable"}</span> : pct(r.borrow_apr, 2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +211,7 @@ function SampledFlows({ s, w }: { s: Snapshot; w: W }) {
       {bs.length === 0 ? (
         <p className="mt-3 text-[15px] text-slate">Flow history fills in as data is collected: nothing observed in the last {w} of snapshot {s.date} yet.</p>
       ) : (
-        <div className="scroll-x mt-3">
+        <div tabIndex={0} className="scroll-x mt-3">
           <table className="data">
             <caption className="sr-only">Observed deposits, withdrawals and net flow, last {w}</caption>
             <tbody>

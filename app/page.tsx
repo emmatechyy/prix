@@ -136,7 +136,7 @@ export default async function Verdicts() {
 
       <section aria-labelledby="key-h" className="mt-12">
         <h2 id="key-h" className="font-serif text-[21px] text-ink">Key numbers</h2>
-        <div className="scroll-x mt-3 rounded-lg border border-rule bg-surface">
+        <div tabIndex={0} className="scroll-x mt-3 rounded-lg border border-rule bg-surface">
           <table className="data">
             <thead>
               <tr>

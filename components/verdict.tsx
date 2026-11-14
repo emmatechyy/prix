@@ -29,9 +29,9 @@ export function VerdictBadge({ v }: { v: VerdictValue }) {
   return (
     <span
       className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 self-start rounded-full border-[1.5px] px-3 text-[15px] font-semibold whitespace-nowrap ${v === "Insufficient data" ? "hatch border-dashed" : ""}`}
-      style={{ color: c, borderColor: c, background: v === "Insufficient data" ? undefined : `color-mix(in srgb, ${c} 10%, transparent)` }}
+      style={{ color: "var(--ink)", borderColor: c, background: v === "Insufficient data" ? undefined : `color-mix(in srgb, ${c} 10%, transparent)` }}
     >
-      <VerdictIcon v={v} />
+      <VerdictIcon v={v} color={c} />
       {VERDICT_WORD[v]}
     </span>
   );
@@ -113,7 +113,7 @@ export function EvidencePanel({ v, m, date, extra }: { v: Verdict; m: RailModel;
         <p className="measure mt-1">
           {plain(v.metric)}. <span className="num font-semibold">{m.valueText}</span>
         </p>
-        <div className="scroll-x mt-3 rounded-lg border border-rule">
+        <div tabIndex={0} className="scroll-x mt-3 rounded-lg border border-rule">
           <table className="data">
             <caption className="sr-only">Evidence for {v.id}</caption>
             <thead>

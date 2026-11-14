@@ -1,4 +1,4 @@
-export const NR = "not reported";
+export const NR = "Not reported";
 
 export function usd(v: number | null | undefined, opts: { compact?: boolean; digits?: number } = {}): string {
   if (v == null || !Number.isFinite(v)) return NR;
