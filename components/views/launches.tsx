@@ -1,18 +1,17 @@
-import type { Metadata } from "next";
 import { Card, CardHeader, Empty, Flags, PageHeader, ScoreBar, SourceError, Sources, TokenLink, Badge } from "@/components/ui";
 import { getLaunches, LAUNCH_WEIGHTS } from "@/lib/model/launches";
 import { ago, explorer, num, pct, price, shortId, usd, utc } from "@/lib/format";
 import { safe } from "@/lib/safe";
 
-export const revalidate = 600;
-export const metadata: Metadata = { title: "Launch radar" };
+
+
 
 function C({ v }: { v: number | null }) {
-  if (v == null) return <span className="text-[12px] text-faint italic">n/r</span>;
+  if (v == null) return <span className="text-[13px] text-faint italic">n/r</span>;
   return <span className={`num text-xs ${v >= 60 ? "text-up" : v >= 35 ? "text-warn" : "text-danger"}`}>{v.toFixed(0)}</span>;
 }
 
-export default async function Launches() {
+export async function LaunchesView() {
   const l = await safe(getLaunches);
   return (
     <>

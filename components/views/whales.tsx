@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
 import { Badge, Card, CardHeader, Empty, PageHeader, SourceError, Sources } from "@/components/ui";
 import { getWhales, WHALE_USD } from "@/lib/model/whales";
 import { ago, explorer, num, shortId, usd, utc } from "@/lib/format";
 import { safe } from "@/lib/safe";
 
-export const revalidate = 600;
-export const metadata: Metadata = { title: "Whale tracking" };
+
+
 
 function Account({ id }: { id: string | null }) {
   if (!id) return <span className="text-faint">not resolved</span>;
@@ -25,7 +24,7 @@ function Tx({ hash, receipt }: { hash: string | null; receipt: string }) {
   return <span className="num text-faint" title={`Receipt ${receipt} — transaction not resolved`}>rcpt {shortId(receipt, 6)}</span>;
 }
 
-export default async function Whales() {
+export async function WhalesView() {
   const w = await safe(getWhales);
   return (
     <>

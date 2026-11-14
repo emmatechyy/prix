@@ -12,6 +12,7 @@
  *       - immutable history (days before the snapshot date): relative tolerance --history-tolerance (default 0.01)
  *       - point-in-time values (custody, TVL, price, depth): --tolerance (default 0.10; live data moves)
  *       - verdicts: must be identical unless --allow-verdict-drift
+ *  --claim H4 also prints the re-derived figures for one claim.
  *  Prints PASS or the diff; exits 1 on mismatch.
  */
 import { listSnapshotDates, parseSnapshot, readSnapshotFile, snapshotPath } from "../lib/snapshot/io.ts";
@@ -75,6 +76,17 @@ const v1 = computeVerdicts(pub, th.rules, th.t);
 const v2 = computeVerdicts(JSON.parse(JSON.stringify(pub)) as Snapshot, th.rules, th.t);
 if (JSON.stringify(v1) === JSON.stringify(v2)) ok("verdicts deterministic: " + v1.map((v) => `${v.id}=${v.verdict}`).join(" "));
 else bad("verdicts not deterministic");
+// --claim H4: print the re-derived figures for one claim (the command shown in each evidence panel).
+const only = arg("--claim", "").toUpperCase();
+if (only) {
+  const v = v1.find((x) => x.id === only);
+  if (!v) bad(`--claim ${only}: no such claim (H1–H6)`);
+  else {
+    out.push(`  ${v.id}  ${v.claim}`, `        verdict ${v.verdict} · ${v.metric_label} = ${v.metric_value ?? "not reported"} · window ${v.window.from}..${v.window.to} (${v.window.days}d) · n=${v.sample_size}`);
+    if (v.coverage) out.push(`        coverage ${(v.coverage.share * 100).toFixed(2)}% (${v.coverage.hours.toFixed(1)} of ${v.coverage.window_hours} h; needs ${(v.coverage.min * 100).toFixed(0)}%)`);
+    for (const e of v.evidence) out.push(`        - ${e.label}: ${e.value}`);
+  }
+}
 
 const rel = (a: number | null | undefined, b: number | null | undefined) => (a == null || b == null ? (a == b ? 0 : Infinity) : a === b ? 0 : Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1e-9));
 function cmp(label: string, a: number | null | undefined, b: number | null | undefined, t: number) {

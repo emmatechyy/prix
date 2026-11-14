@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Badge, Card, CardHeader, Delta, PageHeader, SourceError, Sources, TokenLink } from "@/components/ui";
 import { getIndex } from "@/lib/model/index-model";
 import { getIntentsCustody, getIntentsFlows } from "@/lib/model/network";
@@ -12,7 +11,7 @@ import { Provenance } from "@/components/snapshot-ui";
 import type { Snapshot } from "@/lib/snapshot/schema";
 import { getLending, LENDING_SOURCE } from "@/lib/rhea/lending";
 
-export const metadata: Metadata = { title: "Liquidity flows" };
+
 
 function mins(ms: number | null | undefined) {
   if (ms == null) return "not reported";
@@ -23,7 +22,7 @@ function mins(ms: number | null | undefined) {
 const WINDOWS = { "24h": 1, "7d": 7, "30d": 30 } as const;
 type W = keyof typeof WINDOWS;
 
-export default async function Flows({ searchParams }: { searchParams: Promise<{ w?: string }> }) {
+export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: string }> }) {
   const q = (await searchParams).w;
   const w: W = q === "24h" || q === "30d" ? q : "7d";
   const pub = await getPublished();
@@ -221,7 +220,7 @@ function SampledFlows({ s, w, version, locked }: { s: Snapshot; w: W; version: n
       />
       <nav aria-label="Window" className="flex gap-1.5 px-5 pb-4 sm:px-6">
         {(Object.keys(WINDOWS) as W[]).map((k) => (
-          <Link key={k} href={`/flows?w=${k}`} scroll={false} aria-current={k === w ? "page" : undefined} className={`rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors ${k === w ? "bg-accent text-on-accent" : "border border-border-strong text-text hover:bg-tint"}`}>
+          <Link key={k} href={`/capital?w=${k}#flows`} scroll={false} aria-current={k === w ? "page" : undefined} className={`rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors ${k === w ? "bg-accent text-on-accent" : "border border-border-strong text-text hover:bg-tint"}`}>
             {k}
           </Link>
         ))}
@@ -236,14 +235,14 @@ function SampledFlows({ s, w, version, locked }: { s: Snapshot; w: W; version: n
             ["Sampled net", usd(cur.dep - cur.wd), cur.dep >= cur.wd ? "text-up" : "text-danger"],
             ["Events read", num(cur.events), "text-ink"],
           ].map(([l, v, c]) => (
-            <div key={l} className="rounded-[14px] bg-tint px-4 py-4">
+            <div key={l} className="rounded-lg bg-tint px-4 py-4">
               <p className="text-[13.5px] text-muted">{l}</p>
               <p className={`mt-2 font-serif text-[26px] leading-none sm:text-[30px] ${c}`}>{v}</p>
             </div>
           ))}
           <p className="col-span-2 text-[13px] text-muted sm:col-span-4">
             {num(cur.n)} sampled windows covering {cur.minutes < 120 ? `${cur.minutes.toFixed(1)} min` : `${(cur.minutes / 60).toFixed(1)} h`} of activity since {cur.first?.slice(0, 16).replace("T", " ")} UTC · {num(cur.mints)} mints, {num(cur.burns)} burns, {num(cur.unpriced)} unpriced (excluded) · plain sum of the samples (H5 uses a day-weighted sum so denser sampling on recent days does not dominate; see{" "}
-            <Link href="/thesis#H5" className="underline underline-offset-4 hover:text-text">H5</Link>) ·{" "}
+            <Link href="/#h5" className="underline underline-offset-4 hover:text-text">H5</Link>) ·{" "}
             <a href={`/api/v1/snapshots/${s.date}`} className="underline underline-offset-4 hover:text-text">snapshot</a> ·{" "}
             <a href="https://api.nearblocks.io/v3/intents/txns?limit=100" target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text">NearBlocks /v3/intents/txns ↗</a>
           </p>

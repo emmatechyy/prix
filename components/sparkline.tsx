@@ -1,6 +1,6 @@
 export function Sparkline({ values, width = 96, height = 24, className = "" }: { values: number[]; width?: number; height?: number; className?: string }) {
   const v = values.filter((x) => Number.isFinite(x));
-  if (v.length < 2) return <span className="text-[12px] text-faint">—</span>;
+  if (v.length < 2) return <span className="text-[13px] text-faint">—</span>;
   const min = Math.min(...v);
   const max = Math.max(...v);
   const span = max - min || 1;

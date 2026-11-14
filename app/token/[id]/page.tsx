@@ -117,7 +117,7 @@ export default async function TokenPage({ params }: Props) {
           </div>
         </>
       ) : (
-        <p className="mt-4 rounded-[16px] bg-surface px-5 py-4 text-[15px] text-muted">This token has no pool that passes PRIX integrity checks with at least $1k of liquidity, so no score is computed.</p>
+        <p className="mt-4 rounded-lg bg-surface px-5 py-4 text-[15px] text-muted">This token has no pool that passes PRIX integrity checks with at least $1k of liquidity, so no score is computed.</p>
       )}
 
       <Card className="mt-4">

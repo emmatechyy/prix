@@ -75,3 +75,6 @@ export const explorer = {
   receipt: (id: string) => `https://nearblocks.io/?q=${id}`,
   rheaPool: (id: string) => (id.includes("|") ? `https://app.rhea.finance/poolV2/${id.replace(/\|/g, "@")}` : `https://app.rhea.finance/pool/${id}`),
 };
+
+/** Request time for server-rendered freshness lines (ISR re-renders every few minutes). */
+export const nowMs = () => Date.now();

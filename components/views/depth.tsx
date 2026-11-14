@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge, Card, CardHeader, PageHeader, STAT_GRID, Stat, type Tone } from "@/components/ui";
 import { NoSnapshot, Provenance, snapshotApi } from "@/components/snapshot-ui";
@@ -6,7 +5,7 @@ import { getPublished } from "@/lib/server/published";
 import { DEPTH_SIZES } from "@/lib/depth/slippage";
 import type { DepthRow } from "@/lib/snapshot/schema";
 
-export const metadata: Metadata = { title: "Depth matrix" };
+
 
 const STATUS_TONE: Record<DepthRow["status"], Tone> = { ok: "up", "no-route": "neutral", error: "danger", paused: "warn", "rate-limited": "warn", "not-configured": "neutral" };
 const sizeLabel = (n: number) => (n >= 1e6 ? `$${n / 1e6}M` : `$${n / 1e3}k`);
@@ -14,8 +13,8 @@ const sizeLabel = (n: number) => (n >= 1e6 ? `$${n / 1e6}M` : `$${n / 1e3}k`);
 function Cell({ r }: { r: DepthRow | undefined }) {
   if (!r) return <span className="text-faint">—</span>;
   if (r.status !== "ok") return <Badge tone={STATUS_TONE[r.status]} title={r.error}>{r.status}</Badge>;
-  if (r.size_usd === 1000 && r.relative_slippage === 0) return <span className="text-[12.5px] text-faint" title={`Baseline quote: in $${r.amount_in_usd?.toFixed(2)} → out $${r.amount_out_usd?.toFixed(2)}`}>baseline</span>;
-  if (r.relative_slippage == null) return <span className="text-[12.5px] text-faint" title="No $1k baseline quote on this route">no baseline</span>;
+  if (r.size_usd === 1000 && r.relative_slippage === 0) return <span className="text-[13px] text-faint" title={`Baseline quote: in $${r.amount_in_usd?.toFixed(2)} → out $${r.amount_out_usd?.toFixed(2)}`}>baseline</span>;
+  if (r.relative_slippage == null) return <span className="text-[13px] text-faint" title="No $1k baseline quote on this route">no baseline</span>;
   const v = r.relative_slippage;
   const cls = v <= 0.01 ? "text-up" : v <= 0.1 ? "text-warn" : "text-danger";
   return (
@@ -25,7 +24,7 @@ function Cell({ r }: { r: DepthRow | undefined }) {
   );
 }
 
-export default async function Depth() {
+export async function DepthView() {
   const { snapshot: s, thresholds } = await getPublished();
   if (!s) return (<><PageHeader eyebrow="Depth" title="Depth matrix" /><NoSnapshot /></>);
   const rows = s.depth;
@@ -71,7 +70,7 @@ export default async function Depth() {
                     <td>{i === 0 ? <Link href={`/token/${encodeURIComponent(t)}`} className="font-medium text-ink hover:text-accent hover:underline">{sym.get(t) ?? t}</Link> : null}</td>
                     <td className="text-[13.5px] whitespace-nowrap text-muted">
                       {lane}
-                      <span className="block text-[12px] text-faint">
+                      <span className="block text-[13px] text-faint">
                         {rs[0].router_version}
                         {rs.some((r) => r.app_fee_bps) ? ` · app fee ${Math.max(...rs.map((r) => r.app_fee_bps ?? 0))} bps, reported separately` : ""}
                       </span>
@@ -83,7 +82,7 @@ export default async function Depth() {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-border px-5 py-3.5 text-[12.5px] text-faint sm:px-6">
+        <div className="border-t border-border px-5 py-3.5 text-[13px] text-faint sm:px-6">
           Sources: <a className="underline underline-offset-4 hover:text-text" href="https://1click.chaindefuser.com/docs/v0/openapi.yaml" target="_blank" rel="noreferrer">1Click /v0/quote (dry:true)</a> ·{" "}
           <a className="underline underline-offset-4 hover:text-text" href="https://smartrouter.rhea.finance/findPath" target="_blank" rel="noreferrer">smartrouter.rhea.finance/findPath</a> · AMM math = (1 − fee)·X/(X + x) on the deepest clean pool&apos;s reserves (evidence grade C) · <a className="underline underline-offset-4 hover:text-text" href={snapshotApi(s.date)}>snapshot {s.date}</a>
         </div>
