@@ -1,0 +1,57 @@
+name: intents flows
+# Every 30 minutes: page NEAR Intents events back to the stored cursor (data/history/intents-flow-buckets.json).
+# Commits are batched hourly to the `data` branch ("data: <ISO time> [skip ci]"); the half-hour run
+# carries its result to the next run in the Actions cache. Pushes to `data` never deploy (vercel.json).
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: prix-data
+  cancel-in-progress: false
+jobs:
+  flows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: scripts/ci/data-branch.sh pull
+      - name: restore uncommitted half-hour result
+        uses: actions/cache/restore@v4
+        with:
+          path: _pending
+          key: prix-flows-pending-${{ github.run_id }}
+          restore-keys: prix-flows-pending-
+      - name: use pending state if newer than the data branch
+        run: |
+          if [ -f _pending/intents-flow-buckets.json ]; then
+            node -e 'const f=require("fs");const a=JSON.parse(f.readFileSync("_pending/intents-flow-buckets.json"));let b={};try{b=JSON.parse(f.readFileSync("data/history/intents-flow-buckets.json"))}catch{};process.exit((a.updated_at||"")>(b.updated_at||"")?0:1)' \
+              && cp _pending/intents-flow-buckets.json data/history/ && echo "using pending state" || echo "data branch is newer"
+          fi
+      - run: pnpm flows --max-calls 30
+        env:
+          NEARBLOCKS_API_KEY: ${{ secrets.NEARBLOCKS_API_KEY }}
+      - name: decide whether to commit (hourly batching)
+        id: gate
+        run: |
+          last=$(git -C _data log -1 --format=%ct 2>/dev/null || echo 0)
+          if [ $(( $(date +%s) - last )) -ge 3000 ]; then echo "commit=1" >> "$GITHUB_OUTPUT"; else echo "commit=0" >> "$GITHUB_OUTPUT"; fi
+      - name: commit to data branch
+        if: steps.gate.outputs.commit == '1'
+        run: scripts/ci/data-branch.sh push
+      - name: stash for the next run
+        if: steps.gate.outputs.commit != '1'
+        run: mkdir -p _pending && cp data/history/intents-flow-buckets.json _pending/
+      - uses: actions/cache/save@v4
+        if: steps.gate.outputs.commit != '1'
+        with:
+          path: _pending
+          key: prix-flows-pending-${{ github.run_id }}

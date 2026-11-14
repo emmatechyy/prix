@@ -19,8 +19,10 @@ export const viewport: Viewport = { themeColor: "#e7ecf3", width: "device-width"
 const FOOT = [
   ["Index", "/rankings"],
   ["Thesis", "/thesis"],
+  ["Depth", "/depth"],
   ["Methodology", "/methodology"],
-  ["JSON API", "/api/v1/index"],
+  ["JSON API", "/api/v1/openapi.json"],
+  ["Feed", "/feed.xml"],
 ] as const;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -7,10 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "snapshot": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/snapshot.mts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prebuild": "node --import tsx scripts/check-thresholds.mts",
+    "check:thresholds": "node --import tsx scripts/check-thresholds.mts",
+    "test": "vitest run",
+    "snapshot:daily": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/snapshot-daily.mts",
+    "flows": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/flows-sample.mts",
+    "verdicts": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/verdicts.mts",
+    "verify": "PRIX_CLI=1 node --conditions=react-server --import tsx scripts/verify.mts"
   },
   "dependencies": {
+    "@rhea-finance/cross-chain-aggregation-dex": "^2.1.9",
+    "@rhea-finance/cross-chain-sdk": "^0.1.22",
     "geist": "^1.9.2",
     "lightweight-charts": "^5.3.0",
     "next": "16.4.6",
@@ -27,7 +35,10 @@
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.1.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
   },
   "packageManager": "pnpm@10.34.9",
   "description": "PRIX \u2014 evidence-graded smart index layer for NEAR on-chain markets (read-only).",

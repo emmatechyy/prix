@@ -43,6 +43,8 @@ export const rheaUrls = {
   volumeVariation: `${RHEA_DATA}/24h_volume_variation`,
   historicalTvl: (days: number) => `${RHEA_DATA}/historical_tvl?period=${days}`,
   poolDetail: (id: string) => `${RHEA_API}/pool/detail?pool_id=${encodeURIComponent(id)}`,
+  findPathBase: `${RHEA_ROUTER}/findPath`,
+  poolVolumeBase: `${RHEA_DATA}/pool/<id>/volume`,
   priceHistory: (ids: string[]) => `${RHEA_API}/list-history-token-price-by-ids?ids=${ids.map(encodeURIComponent).join("|")}`,
 };
 
@@ -178,4 +180,14 @@ export async function findPath(tokenIn: string, tokenOut: string, amountInRaw: s
   const r = await fetchJson<{ result_code: number; result_message: string; result_data?: { amount_out: string; routes: { pools: { pool_id: string }[] }[] } }>(url, { revalidate: 900 });
   if (r.result_code !== 0 || !r.result_data) throw new Error(r.result_message || "No route");
   return { amountOutRaw: r.result_data.amount_out, hops: r.result_data.routes.map((x) => x.pools.map((p) => p.pool_id)), url };
+}
+/** Daily USD volume only (one request per pool), for the all-pool H4 denominator. */
+export async function getPoolVolume(id: string): Promise<DailyPoint[]> {
+  const sortD = (a: DailyPoint, b: DailyPoint) => a.date.localeCompare(b.date);
+  if (id.includes("|")) {
+    const v = await fetchJson<{ dateString: string; volume: string }[]>(`${RHEA_API}/get-dcl-pools-volume?pool_id=${encodeURIComponent(id)}`, { revalidate: 3600, timeoutMs: 20000 });
+    return v.map((x) => ({ date: normDate(x.dateString), value: Number(x.volume) })).sort(sortD);
+  }
+  const v = await fetchJson<{ date_string: string; volume_dollar: number }[]>(`${RHEA_DATA}/pool/${encodeURIComponent(id)}/volume`, { revalidate: 3600, timeoutMs: 20000 });
+  return v.map((x) => ({ date: normDate(x.date_string), value: x.volume_dollar })).sort(sortD);
 }

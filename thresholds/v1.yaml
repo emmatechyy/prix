@@ -1,0 +1,83 @@
+# PRIX pre-registered thresholds, v1 (DRAFT)
+# Rule: commit this file BEFORE running verdicts. Any later change = new version
+# (v2, v3...) and the site shows old and new verdicts side by side.
+# Reconcile numbers with the rules currently on /methodology before locking.
+
+version: 1
+locked_at_commit: "<fill with git SHA before first verdict run>"
+verdict_values: [Supported, Mixed, Not supported, Insufficient data]
+global:
+  min_window_days: 30          # no verdict from a window shorter than this
+  min_intents_events: 6000     # below this, Intents-flow claims = Insufficient data
+  missing_data: "not reported" # never estimated
+  evidence_grades:
+    A: direct on-chain (RPC / contract view)
+    B: indexer or API (RHEA indexer, NearBlocks, FastNEAR)
+    C: derived or modelled from A/B
+
+claims:
+  H1:
+    text: NEAR network usage holds up independently of the NEAR price.
+    metric: Spearman rho of 7d-MA daily active accounts vs 7d-MA NEAR price, 180d
+    supported: "abs(rho) < 0.30 AND 30d avg active accounts growth >= 0%"
+    not_supported: "rho >= 0.60"
+    else: Mixed
+    grade: B
+
+  H2:
+    text: NEAR Intents, not the on-chain AMM, is where NEAR's capital now sits.
+    metric: intents_custody_usd / rhea_clean_tvl_usd, daily, last 30d
+    supported: "ratio >= 2.0 on >= 80% of days"
+    not_supported: "ratio < 1.0 on > 50% of days"
+    else: Mixed
+    grade: B
+
+  H3:
+    text: NEAR's markets can absorb institutional-size orders beyond NEAR itself.
+    metric: count of non-NEAR, non-wNEAR tokens with $100k price impact <= 1.0%
+            (RHEA router + Intents dry-run quotes, best of both)
+    supported: ">= 5 tokens"
+    not_supported: "<= 1 token"
+    else: Mixed
+    grade: B   # C for any token priced only via derived routes
+
+  H4:
+    text: Trading activity on RHEA is mostly organic.
+    metric: volume from non-rejected, non-flagged pools / total reported volume, 30d
+    # Edited in place 2026-11-14 while DRAFT (see docs/threshold-diff.md, "Edits after review").
+    # Denominator = daily volume summed over ALL live pools (>= $1k TVL), rejected and flagged
+    # included; numerator = the part from pools that are neither rejected nor wash-flagged.
+    denominator: all live pools (>= $1k TVL), rejected and flagged included
+    wash_flags:
+      max_daily_turnover: 2.0       # pool's mean daily volume over the window / its TVL; above = flagged
+      concentration_min_share: 0.10 # pool's share of all-pool volume ...
+      concentration_tvl_multiple: 5 # ... that is also > 5x its share of clean (non-rejected) TVL = flagged
+    supported: ">= 80%"
+    not_supported: "< 60%"
+    else: Mixed
+    grade: B
+
+  H5:
+    text: Fresh capital is entering NEAR's markets right now.
+    metric: net Intents flow (deposits - withdrawals), 7d and 30d, plus 30d TVL change
+    supported: "30d net > 0 AND 7d net > 0 AND 30d clean TVL change > 0"
+    not_supported: "30d net < 0 AND 7d net < 0"
+    # Edited in place 2026-11-14 while DRAFT: share of window hours actually observed by the
+    # contiguous event pages. Below this, the verdict is Insufficient data. No extrapolation.
+    min_coverage: 0.80
+    else: Mixed
+    grade: B
+
+  H6:
+    text: NEAR Intents recovered from the 2026-10-01 exploit without lasting damage.
+    incident_date: 2026-10-01
+    metric: Intents custody and daily intents.near txns vs pre-incident 7d median
+    supported: "both >= 90% of baseline within 30d of incident_date"
+    not_supported: "either < 70% of baseline at day 30"
+    else: Mixed
+    grade: B
+
+index_rules:
+  min_liquidity_usd: 50000      # below this: shown, but confidence badge = low
+  max_price_impact_10k: 0.10    # above 10% impact: excluded from top-ranked view
+  weights: {depth: 0.30, activity: 0.25, distribution: 0.20, flow: 0.25}
