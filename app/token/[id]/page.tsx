@@ -75,7 +75,7 @@ export default async function TokenPage({ params }: Props) {
         </p>
       </header>
 
-      <section aria-labelledby="cost-h" className="mb-6 rounded-lg border border-rule bg-surface p-4 sm:p-5">
+      <section aria-labelledby="cost-h" className="mb-6 rounded-[20px] bg-surface p-4 sm:p-5">
         <h2 id="cost-h" className="font-serif text-[21px] text-ink">Cost to trade</h2>
         <p className="mt-1 mb-3 text-[15px] text-slate">Relative slippage at $1k to $1M, NEAR Intents (dry-run quotes) and RHEA (Smart Router), from snapshot {snap?.date ?? "not available"}.</p>
         {snap ? <CostChart rows={snap.depth} token={t.id} symbol={t.symbol} date={snap.date} /> : <p className="text-[15px] text-slate">Not reported: no published snapshot.</p>}

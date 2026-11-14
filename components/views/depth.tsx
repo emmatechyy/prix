@@ -19,12 +19,12 @@ function CellView({ c, token, size }: { c: Cell; token: string; size: number }) 
     <details className="group relative">
       <summary
         className={`flex min-h-11 min-w-[84px] cursor-pointer list-none items-center justify-end rounded px-2 text-[15px] [&::-webkit-details-marker]:hidden ${c.kind === "status" ? "hatch text-[13px] text-ink" : "num"}`}
-        style={c.kind === "value" ? { background: `color-mix(in srgb, var(--ink) ${h}%, var(--surface))`, color: h >= HEAT_DARK_TEXT_FROM ? "var(--paper)" : "var(--ink)" } : undefined}
+        style={c.kind === "value" ? { background: `color-mix(in srgb, ${h >= HEAT_DARK_TEXT_FROM ? "var(--heat-deep)" : "var(--ink)"} ${h}%, var(--surface))`, color: h >= HEAT_DARK_TEXT_FROM ? "var(--paper)" : "var(--ink)" } : undefined}
         aria-label={`${token} at ${sizeLabel(size)}: ${c.kind === "value" ? (c.baseline ? "baseline quote" : `${pct} slippage`) : c.label}. Show quote details`}
       >
         {pct}
       </summary>
-      <div className="absolute right-0 z-20 mt-1 w-64 rounded-lg border border-rule bg-surface p-3 text-left text-[13px] leading-relaxed whitespace-normal text-ink">
+      <div className="absolute right-0 z-20 mt-1 w-64 rounded-[20px] bg-surface p-3 text-left text-[13px] leading-relaxed whitespace-normal text-ink">
         <p className="font-semibold">{route}</p>
         {c.kind === "value" ? (
           <p className="num">
@@ -54,7 +54,7 @@ export async function DepthView({ route = "best" }: { route?: RouteView }) {
   const intentsDown = rows.some((r) => r.route === "intents" && (r.status === "paused" || r.status === "rate-limited"));
   return (
     <>
-      <h2 className="font-serif text-[28px] leading-[1.25] text-ink">Depth</h2>
+      <h2 className="display text-[44px] text-ink sm:text-[56px]">Depth</h2>
       <p className="measure mt-2 text-[15px] text-slate">
         What an order of each size would cost, compared with a $1k order on the same route. Cell = relative slippage, net of any flat app fee. NEAR Intents rows are dry-run quotes (nothing can be sent); RHEA rows are Smart Router quotes. {rows.length} quotes, {counts.ok ?? 0} measured, {counts["no-route"] ?? 0} with no route, {failed} failed, paused or rate-limited, all shown. From snapshot{" "}
         <a href={snapshotApi(s.date)} className="num text-ink underline underline-offset-4">
@@ -70,7 +70,7 @@ export async function DepthView({ route = "best" }: { route?: RouteView }) {
           items={(["intents", "rhea", "best"] as const).map((k) => ({ key: k, label: k === "best" ? "Best" : k === "intents" ? "Intents" : "RHEA", href: `/capital?route=${k}#depth` }))}
         />
       </div>
-      <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x rounded-[20px] bg-surface">
         <table className="data [&_td:first-child]:sticky [&_td:first-child]:left-0 [&_td:first-child]:z-10 [&_td:first-child]:bg-surface [&_th:first-child]:left-0 [&_th:first-child]:z-20">
           <caption className="sr-only">Relative slippage by token and order size, {ROUTE_LABEL[route]}</caption>
           <thead>

@@ -68,7 +68,7 @@ export async function RankingView({ showLow = false, sort: sortParam }: { showLo
         <Link href="/method#index" className="text-ink underline underline-offset-4">How the score works</Link>.
       </p>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <Link href={`/tokens${toggle.size ? `?${toggle}` : ""}`} scroll={false} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-rule bg-surface px-3 text-[15px] text-ink hover:bg-wash">
+        <Link href={`/tokens${toggle.size ? `?${toggle}` : ""}`} scroll={false} className="inline-flex min-h-11 items-center gap-2 rounded-[20px] bg-surface px-3 text-[15px] text-ink hover:bg-wash">
           <span className={`inline-block h-4 w-7 rounded-full border border-ink p-[1px] ${showLow ? "bg-ink" : ""}`} aria-hidden>
             <span className={`block h-full w-3 rounded-full ${showLow ? "translate-x-3 bg-paper" : "bg-ink"}`} />
           </span>
@@ -78,7 +78,7 @@ export async function RankingView({ showLow = false, sort: sortParam }: { showLo
           {high.length} measured · low confidence = liquidity under {usd(idx.v.rules.min_liquidity_usd)}, cost to trade $10k over {(idx.v.rules.max_price_impact_10k * 100).toFixed(0)}%, or no measured depth
         </span>
       </div>
-      <div tabIndex={0} className="scroll-x max-h-[75vh] rounded-lg border border-rule bg-surface">
+      <div tabIndex={0} className="scroll-x max-h-[75vh] rounded-[20px] bg-surface">
         <table className="data">
           <caption className="sr-only">Tokens ranked by PRIX score, sorted by {S.label.toLowerCase()}</caption>
           <thead>

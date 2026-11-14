@@ -30,7 +30,7 @@ export const SOURCES: [string, string, string][] = [
 /** Definitions behind the index and the signals (integrity rules, score, heuristics, launch score, labels). */
 export function MethodDefinitions({ th }: { th: ReturnType<typeof loadThresholds> }) {
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6 [&>*]:min-w-0">
         <Section id="integrity" title="2. Integrity rules — what PRIX refuses to count">
           <p>PRIX recomputes every pool&apos;s value as <code>Σ reserve × RHEA price</code> from on-chain reserves (AMM reserves from the RHEA indexer, DCL reserves read directly from <code>dclv2.ref-labs.near</code>). A pool is excluded from every metric if any rule trips:</p>
           <ul>

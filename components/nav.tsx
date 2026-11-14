@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/** The four destinations (frontend spec §2). Same items on every page, top bar ≥ 900px, bottom tabs below. */
+/** The four destinations. Same items everywhere: a floating pill on top (≥ 900px), a floating tab pill at the bottom below. */
 export const NAV = [
   { href: "/", label: "Verdicts", icon: "M4 12.5l4.5 4.5L20 6.5" },
   { href: "/tokens", label: "Tokens", icon: "M4 6h16M4 12h16M4 18h10" },
@@ -15,17 +15,14 @@ const isActive = (path: string, href: string) => (href === "/" ? path === "/" : 
 
 export function Logo() {
   return (
-    <Link href="/" className="flex min-h-11 shrink-0 items-center gap-2 rounded" aria-label="PRIX, verdicts">
-      <span className="font-serif text-[24px] leading-none text-ink">PRIX</span>
+    <Link href="/" className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-full" aria-label="PRIX, verdicts">
+      <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink" aria-hidden>
+        <svg width="15" height="15" viewBox="0 0 14 14">
+          <path d="M1.5 11.5 L5 6.5 L8 9 L12.5 2.5" stroke="var(--paper)" strokeWidth="1.9" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <span className="font-serif text-[28px] leading-none text-ink">PRIX</span>
     </Link>
-  );
-}
-
-function Icon({ d }: { d: string }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d={d} />
-    </svg>
   );
 }
 
@@ -33,9 +30,10 @@ export function SiteNav() {
   const path = usePathname();
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-rule bg-paper">
-        <div className="mx-auto flex h-14 w-full max-w-[1080px] items-center justify-between px-4 sm:px-6">
+      <div className="pointer-events-none sticky top-0 z-40 px-3 pt-4 sm:pt-5">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-max items-center gap-6 rounded-full bg-[rgba(247,249,252,0.85)] py-2 pr-2 pl-5 shadow-pill backdrop-blur-md">
           <Logo />
+          <span className="hidden h-5 w-px bg-rule-strong min-[900px]:block" aria-hidden />
           <nav aria-label="Primary" className="hidden min-[900px]:block">
             <ul className="flex items-center gap-1">
               {NAV.map((n) => {
@@ -45,7 +43,7 @@ export function SiteNav() {
                     <Link
                       href={n.href}
                       aria-current={a ? "page" : undefined}
-                      className={`inline-flex min-h-11 items-center rounded-lg px-4 text-[15px] ${a ? "font-semibold text-ink underline decoration-2 underline-offset-[10px]" : "text-slate hover:text-ink"}`}
+                      className={`inline-flex min-h-11 items-center rounded-full px-5 text-[16px] transition-colors duration-300 ${a ? "bg-ink font-medium text-paper underline decoration-1 underline-offset-[6px]" : "text-ink hover:bg-wash"}`}
                     >
                       {n.label}
                     </Link>
@@ -55,9 +53,9 @@ export function SiteNav() {
             </ul>
           </nav>
         </div>
-      </header>
-      <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-surface pb-[env(safe-area-inset-bottom)] min-[900px]:hidden">
-        <ul className="grid h-14 grid-cols-4">
+      </div>
+      <nav aria-label="Primary" className="fixed inset-x-3 bottom-3 z-40 rounded-full bg-[rgba(247,249,252,0.92)] p-1.5 pb-[max(6px,env(safe-area-inset-bottom))] shadow-float backdrop-blur-md min-[900px]:hidden">
+        <ul className="grid grid-cols-4 gap-1">
           {NAV.map((n) => {
             const a = isActive(path, n.href);
             return (
@@ -65,10 +63,12 @@ export function SiteNav() {
                 <Link
                   href={n.href}
                   aria-current={a ? "page" : undefined}
-                  className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-[13px] ${a ? "font-semibold text-ink" : "text-slate"}`}
+                  className={`flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-[13px] ${a ? "bg-ink font-semibold text-paper" : "text-ink"}`}
                 >
-                  <Icon d={n.icon} />
-                  <span className={a ? "underline decoration-2 underline-offset-4" : ""}>{n.label}</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d={n.icon} />
+                  </svg>
+                  <span className={a ? "underline decoration-1 underline-offset-2" : ""}>{n.label}</span>
                 </Link>
               </li>
             );

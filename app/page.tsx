@@ -61,42 +61,54 @@ export default async function Verdicts() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <HashOpener />
-      <section aria-labelledby="title" className="pb-8">
-        <h1 id="title" className="font-serif text-[28px] leading-[1.2] text-ink min-[600px]:text-[40px]">{COPY.siteTitle}</h1>
-        <p className="measure mt-3 text-[17px] text-ink">
-          <span className="font-semibold">{verdictSummary(pub.verdicts)}.</span> <span className="text-slate">Six claims, each tested against a threshold written down before the data was read.</span>
+      <section aria-labelledby="title" className="mx-auto max-w-[920px] pb-14 text-center sm:pb-20">
+        <p className="text-[17px] font-medium text-ink sm:text-[20px]">An evidence-graded index of NEAR on-chain markets.</p>
+        <h1 id="title" className="display mt-5 text-[56px] leading-[0.95] text-ink sm:text-[88px] lg:text-[112px]">
+          The case for NEAR, <span className="italic">tested</span> daily
+        </h1>
+        <p className="mx-auto mt-6 max-w-[620px] text-[17px] leading-[1.6] text-ink sm:text-[19px]">
+          <span className="font-semibold">{verdictSummary(pub.verdicts)}.</span> Six claims, each tested against a threshold written down before the data was read.
         </p>
-        <ol aria-label="All six verdicts" className="mt-4 flex h-11 w-full overflow-hidden rounded-lg border border-rule">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="#claims-h" className="inline-flex min-h-12 items-center rounded-full bg-ink px-7 text-[16px] font-medium text-paper transition-colors duration-300 hover:bg-accent-hover">See the six verdicts</a>
+          <Link href="/method" className="inline-flex min-h-12 items-center rounded-full border border-ink px-7 text-[16px] font-medium text-ink transition-colors duration-300 hover:bg-wash">How verdicts work</Link>
+        </div>
+        <ol aria-label="All six verdicts" className="mt-8 flex flex-wrap justify-center gap-2.5">
           {ordered.map((v) => (
-            <li key={v.id} className="min-w-0 flex-1 border-r border-surface last:border-r-0">
+            <li key={v.id}>
               <a
                 href={`#${v.id.toLowerCase()}`}
-                className={`flex h-full items-center justify-center gap-1 text-[13px] font-semibold ${v.verdict === "Insufficient data" ? "hatch" : ""}`}
-                style={{ background: v.verdict === "Insufficient data" ? undefined : `color-mix(in srgb, ${SEG[v.verdict]} 18%, var(--surface))`, color: SEG[v.verdict] }}
+                className={`inline-flex min-h-11 items-center gap-2 rounded-[14px] border py-1.5 pr-4 pl-2 text-[15px] font-medium text-ink transition-colors duration-300 hover:bg-wash ${v.verdict === "Insufficient data" ? "hatch border-dashed" : ""}`}
+                style={{ borderColor: SEG[v.verdict] }}
                 aria-label={`${v.id}: ${VERDICT_WORD[v.verdict]}`}
               >
-                <VerdictIcon v={v.verdict} size={15} />
-                <span className="text-ink">{v.id}</span>
+                <span className="grid h-7 w-7 place-items-center rounded-lg" style={{ background: `color-mix(in srgb, ${SEG[v.verdict]} 14%, var(--surface))` }}>
+                  <VerdictIcon v={v.verdict} size={15} color={SEG[v.verdict]} />
+                </span>
+                {v.id} · {VERDICT_WORD[v.verdict]}
               </a>
             </li>
           ))}
         </ol>
-        <div className="mt-3">
+        <div className="mt-6 flex justify-center">
           <FreshnessLine asOf={s.as_of} date={s.date} version={pub.thresholds.t.version} locked={pub.thresholds.locked} />
         </div>
       </section>
 
-      <section aria-labelledby="claims-h">
-        <h2 id="claims-h" className="sr-only">Claims</h2>
-        <ul className="grid gap-3">
+      <section aria-labelledby="claims-h" className="scroll-mt-24">
+        <div className="mb-8 grid gap-x-12 gap-y-3 lg:grid-cols-2 lg:items-end">
+          <h2 id="claims-h" className="display text-[56px] text-ink sm:text-[72px]">Six claims</h2>
+          <p className="max-w-[46ch] text-[17px] leading-[1.6] text-slate lg:pb-2">Each rail shows where the measured value sits against its two pre-registered thresholds. Open a claim for the evidence, sources and a command to re-run it.</p>
+        </div>
+        <ul className="grid gap-4">
           {ordered.map((v) => {
             const m = railFor(v, pub.thresholds.rules);
             return (
               <li key={v.id}>
-                <details id={v.id.toLowerCase()} name="claim" className="group scroll-mt-20 rounded-lg border border-rule bg-surface">
-                  <summary className="block cursor-pointer list-none px-4 py-4 sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
+                <details id={v.id.toLowerCase()} name="claim" className="group scroll-mt-24 rounded-[20px] bg-surface">
+                  <summary className="block cursor-pointer list-none px-5 py-5 sm:px-8 sm:py-7 [&::-webkit-details-marker]:hidden">
                     <div className="flex flex-col gap-3 min-[600px]:flex-row min-[600px]:items-start min-[600px]:justify-between">
-                      <h3 className="measure font-serif text-[21px] leading-[1.3] text-ink">
+                      <h3 className="measure font-serif text-[28px] leading-[1.1] text-ink sm:text-[34px]">
                         <span className="sr-only">{v.id}. </span>
                         {plain(v.claim)}
                       </h3>
@@ -124,7 +136,7 @@ export default async function Verdicts() {
                       <span className="hidden group-open:inline">Hide evidence</span>
                     </span>
                   </summary>
-                  <div className="px-4 pb-5 sm:px-6">
+                  <div className="px-5 pb-6 sm:px-8">
                     <EvidencePanel v={v} m={m} date={s.date} extra={v.id === "H6" ? <IncidentSources s={s} /> : null} />
                   </div>
                 </details>
@@ -134,9 +146,9 @@ export default async function Verdicts() {
         </ul>
       </section>
 
-      <section aria-labelledby="key-h" className="mt-12">
-        <h2 id="key-h" className="font-serif text-[21px] text-ink">Key numbers</h2>
-        <div tabIndex={0} className="scroll-x mt-3 rounded-lg border border-rule bg-surface">
+      <section aria-labelledby="key-h" className="mt-20 sm:mt-28">
+        <h2 id="key-h" className="display mb-8 text-[56px] text-ink sm:text-[72px]">Key numbers</h2>
+        <div tabIndex={0} className="scroll-x rounded-[20px] bg-surface py-2">
           <table className="data">
             <thead>
               <tr>
@@ -173,6 +185,18 @@ export default async function Verdicts() {
             <span className="text-slate">not reported right now.</span>
           )}
         </p>
+      </section>
+
+      <section aria-labelledby="band-h" className="relative mt-20 bg-ink py-16 text-paper before:absolute before:inset-y-0 before:left-1/2 before:-z-0 before:w-screen before:-translate-x-1/2 before:bg-ink sm:mt-28 sm:py-24">
+        <div className="relative mx-auto max-w-[820px] text-center">
+          <h2 id="band-h" className="display text-[48px] sm:text-[72px]">Every figure links to its source.</h2>
+          <p className="mx-auto mt-5 max-w-[56ch] text-[17px] leading-[1.6]">
+            Missing data reads “Not reported”, never an estimate. The verdicts come from one hashed snapshot that anyone can rebuild with three commands.
+          </p>
+          <Link href="/method#rerun" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-paper px-7 text-[16px] font-medium text-ink transition-colors duration-300 hover:bg-white">
+            Re-run it yourself
+          </Link>
+        </div>
       </section>
     </>
   );

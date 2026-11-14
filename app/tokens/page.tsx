@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageTitle } from "@/components/ui";
 import { Suspense } from "react";
 import { SegmentedControl } from "@/components/segmented";
 import { RankingView } from "@/components/views/ranking";
@@ -26,12 +27,11 @@ export default async function Tokens({ searchParams }: PageProps<"/tokens">) {
   const view = pick(sp.view);
   return (
     <>
-      <h1 className="font-serif text-[28px] leading-[1.2] text-ink">Tokens</h1>
-      <p className="measure mt-2 text-[17px] text-slate">Every token PRIX can measure on RHEA, scored on what it costs to trade, how much it trades, who holds it and where it’s flowing.</p>
-      <div className="mt-5 mb-6">
+      <PageTitle title="Tokens">Every token PRIX can measure on RHEA, scored on what it costs to trade, how much it trades, who holds it and where it’s flowing.</PageTitle>
+      <div className="-mt-4 mb-8">
         <SegmentedControl label="Token views" items={[...VIEWS]} current={view} />
       </div>
-      <Suspense key={view} fallback={<p className="flex min-h-11 items-center rounded-lg border border-rule bg-surface px-4 text-[15px] text-slate">Loading live token data…</p>}>
+      <Suspense key={view} fallback={<p className="flex min-h-11 items-center rounded-[20px] bg-surface px-4 text-[15px] text-slate">Loading live token data…</p>}>
         {view === "ranking" && <RankingView showLow={sp.low === "1"} sort={typeof sp.sort === "string" ? sp.sort : undefined} />}
         {view === "whales" && <WhalesView />}
         {view === "launches" && <LaunchesView />}

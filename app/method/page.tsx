@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublished, REPO } from "@/lib/server/published";
 import { CopyCommand } from "@/components/copy-command";
+import { PageTitle } from "@/components/ui";
 import { EvidenceGrade } from "@/components/verdict";
 import { GRADE_TEXT } from "@/lib/copy";
 import { MethodDefinitions, SOURCES } from "@/components/views/method-definitions";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const H2 = ({ id, children }: { id: string; children: React.ReactNode }) => (
-  <h2 id={id} className="scroll-mt-20 font-serif text-[28px] leading-[1.25] text-ink">
+  <h2 id={id} className="display scroll-mt-28 text-[44px] text-ink sm:text-[56px]">
     {children}
   </h2>
 );
@@ -37,11 +38,10 @@ export default async function Method() {
   }
   const example = s ? `curl -s https://prix-orcin.vercel.app/api/v1/thesis` : "";
   return (
-    <article className="grid gap-10 [&>*]:min-w-0">
+    <article className="grid gap-16 sm:gap-20 [&>*]:min-w-0">
       <header>
-        <h1 className="font-serif text-[28px] leading-[1.2] text-ink">Method</h1>
-        <p className="measure mt-2 text-[17px] text-slate">How PRIX reaches a verdict, and how to check it yourself.</p>
-        <nav aria-label="On this page" className="mt-4 flex flex-wrap gap-x-1 gap-y-1 text-[15px]">
+        <PageTitle title="Method">How PRIX reaches a verdict, and how to check it yourself.</PageTitle>
+        <nav aria-label="On this page" className="-mt-4 flex flex-wrap gap-2 text-[15px]">
           {[
             ["how", "How verdicts work"],
             ["thresholds", "Thresholds"],
@@ -52,7 +52,7 @@ export default async function Method() {
             ["limits", "Limits and neutrality"],
             ["changelog", "Changelog"],
           ].map(([id, l]) => (
-            <a key={id} href={`#${id}`} className="inline-flex min-h-11 items-center rounded-lg border border-rule px-3 text-ink hover:bg-wash">
+            <a key={id} href={`#${id}`} className="inline-flex min-h-11 items-center rounded-full border border-rule-strong px-4 font-medium text-ink transition-colors duration-300 hover:bg-wash">
               {l}
             </a>
           ))}
@@ -80,7 +80,7 @@ export default async function Method() {
             what changed from earlier rules
           </a>
         </p>
-        <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
+        <div tabIndex={0} className="scroll-x rounded-[20px] bg-surface py-1">
           <table className="data">
             <caption className="sr-only">Pre-registered thresholds for each claim</caption>
             <thead>
@@ -130,7 +130,7 @@ export default async function Method() {
 
       <section aria-labelledby="sources" className="grid min-w-0 gap-3 [&>*]:min-w-0">
         <H2 id="sources">Data sources</H2>
-        <div tabIndex={0} className="scroll-x rounded-lg border border-rule bg-surface">
+        <div tabIndex={0} className="scroll-x rounded-[20px] bg-surface py-1">
           <table className="data">
             <caption className="sr-only">Data sources and when the published snapshot last fetched them</caption>
             <thead>
@@ -223,7 +223,7 @@ export default async function Method() {
         </ol>
       </section>
 
-      <section aria-labelledby="definitions" className="grid min-w-0 gap-3 [&>*]:min-w-0">
+      <section aria-labelledby="definitions" className="grid min-w-0 grid-cols-1 gap-3 [&>*]:min-w-0">
         <H2 id="definitions">Definitions behind the index</H2>
         <P>The rules behind Tokens and Capital: what PRIX refuses to count, how the score is built, and the curated labels.</P>
         <MethodDefinitions th={th} />

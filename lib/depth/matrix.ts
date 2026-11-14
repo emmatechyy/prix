@@ -30,11 +30,11 @@ export function cellFor(rows: DepthRow[], token: string, size: number, view: Rou
 /**
  * Neutral heat (ink share of the cell background) for a slippage; colour stays reserved for verdicts.
  * Two bands with a gap in the middle so the cell text (ink below, paper above) always keeps AA contrast:
- * 0.1%–3.16% → 6–30%, 3.16%–100% → 62–78% (the split is the log midpoint).
+ * 0.1%–3.16% → 4–22% cobalt, 3.16%–100% → 70–100% deep cobalt (the split is the log midpoint).
  */
 export function heat(s: number): number {
   if (s <= 0.001) return 0;
   const t = Math.min(1, Math.log10(s * 1000) / 3);
-  return t < 0.5 ? Math.round(6 + t * 48) : Math.round(62 + (t - 0.5) * 32);
+  return t < 0.5 ? Math.round(4 + t * 36) : Math.round(70 + (t - 0.5) * 60);
 }
-export const HEAT_DARK_TEXT_FROM = 62;
+export const HEAT_DARK_TEXT_FROM = 70;

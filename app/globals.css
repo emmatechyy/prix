@@ -1,90 +1,49 @@
 @import "tailwindcss";
 
 /*
-  Design tokens. Visual language adapted from a light editorial template:
-  cool paper background, a single cobalt ink, serif display type over a grotesk text face,
-  pill controls, soft 16–20px cards with no hard borders, and blur-up motion.
-*/
-/*
-  PRIX design tokens (frontend spec §3). Colour means evidence: the UI is neutral ink on paper,
-  and colour appears only on verdicts and evidence grades. Dark values apply under
-  prefers-color-scheme: dark unless the reader picked a theme ([data-theme]).
+  PRIX design tokens, after the Broadcast Framer template: cool paper, one cobalt ink, Instrument Serif
+  display over Host Grotesk text, Geist Mono figures, pill controls, soft borderless 20px cards.
+  Colour means evidence: verdict colours are the only strong colour besides cobalt, and every verdict
+  also carries an icon and a word. Light only (a dark theme fought the template).
 */
 :root {
-  --ink: #101b26;
-  --slate: #566576;
-  --paper: #eef1f5;
-  --surface: #ffffff;
-  --rule: #d3dae3;
+  --ink: #2a3fd6; /* cobalt: headings, copy, controls */
+  --heat-deep: #182280; /* dark end of the depth heat map only (paper text on it stays AA) */
+  --deep: #16218a; /* deep cobalt: dense figures in tables */
+  --slate: #4f5fc2; /* secondary copy (AA on paper and cards) */
+  --paper: #e7ecf3;
+  --surface: #f6f8fc;
+  --rule: #cdd4ef;
+  --rule-strong: #aab5e6;
+  --wash: rgba(42, 63, 214, 0.08);
   --supported: #0f7b5f;
   --mixed: #a66a0b;
   --not-supported: #b3382c;
   --no-data: #6b7686;
-  --rule-strong: #b7c1cd;
-  --wash: rgba(16, 27, 38, 0.05);
 
-  /* Legacy names used across existing views, mapped onto the spec tokens. */
   --bg: var(--paper);
-  --surface-2: var(--paper);
+  --surface-2: #fbfcfe;
   --tint: var(--wash);
-  --tint-strong: rgba(16, 27, 38, 0.09);
+  --tint-strong: rgba(42, 63, 214, 0.14);
   --border: var(--rule);
   --border-strong: var(--rule-strong);
   --text: var(--ink);
   --muted: var(--slate);
   --faint: var(--slate);
   --accent: var(--ink);
-  --accent-hover: #24323f;
-  --on-accent: var(--surface);
-  --periwinkle: var(--rule);
+  --accent-hover: #2234bb;
+  --on-accent: var(--paper);
+  --periwinkle: #c9d0f0;
   --up: var(--supported);
   --up-fill: var(--supported);
   --warn: var(--mixed);
   --warn-fill: rgba(166, 106, 11, 0.14);
   --danger: var(--not-supported);
   --danger-fill: var(--not-supported);
-  --shadow-pill: none;
-  --shadow-float: none;
+  --shadow-pill: 0 8px 24px rgba(42, 63, 214, 0.1);
+  --shadow-float: 0 24px 48px rgba(12, 20, 90, 0.18);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ink: #e8edf3;
-    --slate: #9aa8b8;
-    --paper: #0e141b;
-    --surface: #151d26;
-    --rule: #263241;
-    --rule-strong: #3a4859;
-    --supported: #3cc9a0;
-    --mixed: #e3a63b;
-    --not-supported: #f0706b;
-    --no-data: #8b97a8;
-    --wash: rgba(232, 237, 243, 0.06);
-    --tint-strong: rgba(232, 237, 243, 0.1);
-    --accent-hover: #cfd8e2;
-    --on-accent: #0e141b;
-    --warn-fill: rgba(227, 166, 59, 0.16);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --ink: #e8edf3;
-  --slate: #9aa8b8;
-  --paper: #0e141b;
-  --surface: #151d26;
-  --rule: #263241;
-  --rule-strong: #3a4859;
-  --supported: #3cc9a0;
-  --mixed: #e3a63b;
-  --not-supported: #f0706b;
-  --no-data: #8b97a8;
-  --wash: rgba(232, 237, 243, 0.06);
-  --tint-strong: rgba(232, 237, 243, 0.1);
-  --accent-hover: #cfd8e2;
-  --on-accent: #0e141b;
-  --warn-fill: rgba(227, 166, 59, 0.16);
-  color-scheme: dark;
 }
 
 @theme inline {
@@ -111,6 +70,7 @@
   --color-danger: var(--danger);
   --color-danger-fill: var(--danger-fill);
   --color-slate: var(--slate);
+  --color-deep: var(--deep);
   --color-wash: var(--wash);
   --color-paper: var(--paper);
   --color-rule: var(--rule);
@@ -118,12 +78,12 @@
   --color-mixed: var(--mixed);
   --color-not-supported: var(--not-supported);
   --color-no-data: var(--no-data);
-  --font-sans: var(--font-plex);
-  --font-serif: var(--font-newsreader);
-  --font-mono: var(--font-plex);
-  --radius-card: 8px;
-  --radius-tile: 8px;
-  --radius-chip: 8px;
+  --font-sans: var(--font-host-grotesk);
+  --font-serif: var(--font-instrument-serif);
+  --font-mono: var(--font-geist-mono);
+  --radius-card: 20px;
+  --radius-tile: 16px;
+  --radius-chip: 14px;
   --shadow-pill: var(--shadow-pill);
   --shadow-float: var(--shadow-float);
 }
@@ -135,23 +95,25 @@ html {
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-plex), system-ui, sans-serif;
-  font-size: 17px;
+  font-family: var(--font-host-grotesk), system-ui, sans-serif;
+  font-size: 16px;
   line-height: 1.5;
   overflow-x: clip;
 }
 .font-serif,
 .display {
-  font-family: var(--font-newsreader), Georgia, serif;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: 0;
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 .num {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 ::selection {
-  background: rgba(16, 27, 38, 0.18);
+  background: rgba(42, 63, 214, 0.2);
 }
 a {
   text-underline-offset: 3px;
@@ -159,7 +121,7 @@ a {
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .measure {
   max-width: 68ch;
@@ -199,7 +161,7 @@ table.data td {
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
   vertical-align: middle;
-  color: var(--ink);
+  color: var(--deep);
 }
 table.data th:first-child,
 table.data td:first-child {

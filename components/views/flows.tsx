@@ -30,12 +30,12 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
   const pub = await getPublished();
   return (
     <>
-      <h2 className="font-serif text-[28px] leading-[1.25] text-ink">Flows</h2>
+      <h2 className="display text-[44px] text-ink sm:text-[56px]">Flows</h2>
       <p className="measure mt-2 mb-4 text-[15px] text-slate">Deposits into and withdrawals out of NEAR Intents, the layer that moves assets in and out of NEAR. Every window states how much of it was actually observed.</p>
       <div className="grid gap-4">
         {pub.snapshot && <SampledFlows s={pub.snapshot} w={w} />}
       </div>
-      <Suspense fallback={<p className="mt-4 flex min-h-11 items-center rounded-lg border border-rule bg-surface px-4 text-[15px] text-slate">Loading live flow detail (sectors, swap pressure, assets held, lending)…</p>}>
+      <Suspense fallback={<p className="mt-4 flex min-h-11 items-center rounded-[20px] bg-surface px-4 text-[15px] text-slate">Loading live flow detail (sectors, swap pressure, assets held, lending)…</p>}>
         <FlowDetails />
       </Suspense>
     </>
@@ -50,7 +50,7 @@ async function FlowDetails() {
   const tokenFlows = idx.ok ? idx.v.rows.filter((r) => r.flow && r.flow.count > 0).sort((a, b) => Math.abs(b.flow!.netUsd) - Math.abs(a.flow!.netUsd)) : [];
   return (
     <>
-      <details className="mt-4 rounded-lg border border-rule bg-surface">
+      <details className="mt-4 rounded-[20px] bg-surface">
         <summary className="flex min-h-11 cursor-pointer items-center px-4 text-[15px] font-medium text-ink">More flow detail: liquidity by sector, swap pressure, assets held by NEAR Intents, RHEA Lending</summary>
       <div className="grid gap-4 p-2 sm:p-4">
         <Card>
@@ -212,7 +212,7 @@ function SampledFlows({ s, w }: { s: Snapshot; w: W }) {
   const cov = observedCoverage(bs, end, days);
   const hours = (h: number) => (h < 1 ? `${Math.round(h * 60)} min` : `${h.toFixed(1)}h`);
   return (
-    <section aria-label="Sampled NEAR Intents flows" className="min-w-0 rounded-lg border border-rule bg-surface p-4 sm:p-5">
+    <section aria-label="Sampled NEAR Intents flows" className="min-w-0 rounded-[20px] bg-surface p-4 sm:p-5">
       <SegmentedControl label="Flow window" current={w} items={(Object.keys(WINDOWS) as W[]).map((k) => ({ key: k, label: k, href: `/capital?w=${k}#flows` }))} />
       {cov.share < 1 && (
         <p className="mt-3 text-[15px] text-ink">

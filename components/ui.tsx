@@ -4,29 +4,39 @@ import { NR, pct } from "@/lib/format";
 import { flagText } from "@/lib/copy";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string; tone?: "paper" | "cobalt" }) {
-  return <section className={`min-w-0 overflow-hidden rounded-lg border border-rule bg-surface ${className}`}>{children}</section>;
+  return <section className={`min-w-0 overflow-hidden rounded-[20px] bg-surface ${className}`}>{children}</section>;
 }
 
 export function CardHeader({ title, subtitle, right, id }: { title: ReactNode; subtitle?: ReactNode; right?: ReactNode; id?: string }) {
   return (
-    <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-4 pt-4 pb-3 sm:px-5">
+    <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-5 pb-4 sm:px-6 sm:pt-6">
       <div className="min-w-0 flex-1 basis-[240px]">
-        <h3 id={id} className="font-serif text-[21px] leading-[1.3] text-ink">
+        <h3 id={id} className="font-serif text-[26px] leading-[1.1] text-ink sm:text-[28px]">
           {title}
         </h3>
-        {subtitle && <div className="measure mt-1 text-[15px] leading-[1.5] text-slate">{subtitle}</div>}
+        {subtitle && <div className="mt-1.5 max-w-[68ch] text-[15px] leading-[1.5] text-slate">{subtitle}</div>}
       </div>
       {right && <div className="shrink-0 pt-1 text-[15px] text-slate">{right}</div>}
     </header>
   );
 }
 
-/** Section heading inside a page (each page has its own h1). */
+/** Page title in the template's section-head layout: big serif left, one short paragraph right. */
+export function PageTitle({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <div className="mb-10 grid gap-x-12 gap-y-4 sm:mb-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end">
+      <h1 className="display text-[56px] text-ink sm:text-[72px] lg:text-[88px]">{title}</h1>
+      {children && <div className="max-w-[46ch] text-[17px] leading-[1.6] text-slate lg:pb-3">{children}</div>}
+    </div>
+  );
+}
+
+/** Section heading inside a page. */
 export function PageHeader({ title, children, id }: { eyebrow?: string; title: string; children?: ReactNode; id?: string }) {
   return (
-    <div className="mb-5">
-      <h2 id={id} className="font-serif text-[28px] leading-[1.25] text-ink">{title}</h2>
-      {children && <div className="measure mt-2 text-[15px] leading-[1.6] text-slate">{children}</div>}
+    <div className="mb-6 grid gap-x-12 gap-y-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end">
+      <h2 id={id} className="display text-[44px] text-ink sm:text-[56px]">{title}</h2>
+      {children && <div className="max-w-[52ch] text-[16px] leading-[1.6] text-slate lg:pb-1.5">{children}</div>}
     </div>
   );
 }
@@ -45,11 +55,11 @@ export function PillLink({ href, children, variant = "primary" }: { href: string
 
 export function Stat({ label, value, sub, source }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "up" | "down" | "warn"; source?: string }) {
   return (
-    <div className="flex min-w-0 flex-col rounded-lg border border-rule bg-surface px-4 py-4">
-      <p className="text-[15px] leading-snug text-slate">{label}</p>
-      <p className="num mt-2 truncate text-[21px] leading-tight font-semibold text-ink">{value}</p>
-      {sub && <p className="mt-1 text-[13px] leading-snug text-slate">{sub}</p>}
-      {source && <p className="mt-auto pt-2"><SourceLink href={source} label="source" /></p>}
+    <div className="flex min-w-0 flex-col rounded-[16px] bg-surface px-5 py-5 sm:px-6">
+      <p className="text-[14px] leading-snug text-slate">{label}</p>
+      <p className="mt-3 truncate font-serif text-[34px] leading-none text-ink sm:text-[40px]">{value}</p>
+      {sub && <p className="mt-2 text-[13px] leading-snug text-slate">{sub}</p>}
+      {source && <p className="mt-auto pt-3"><SourceLink href={source} label="source" /></p>}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 export function SegmentedControl({ label, items, current }: { label: string; items: { key: string; label: string; href: string }[]; current: string }) {
   return (
     <nav aria-label={label} className="scroll-x">
-      <ul className="inline-flex rounded-lg border border-rule bg-surface p-1">
+      <ul className="inline-flex gap-1 rounded-full bg-surface p-1">
         {items.map((i) => {
           const on = i.key === current;
           return (
@@ -13,7 +13,7 @@ export function SegmentedControl({ label, items, current }: { label: string; ite
                 href={i.href}
                 scroll={false}
                 aria-current={on ? "page" : undefined}
-                className={`inline-flex min-h-11 items-center rounded-md px-4 text-[15px] whitespace-nowrap ${on ? "bg-ink font-semibold text-paper" : "text-ink hover:bg-wash"}`}
+                className={`inline-flex min-h-11 items-center rounded-full px-5 text-[15px] whitespace-nowrap transition-colors duration-300 ${on ? "bg-ink font-semibold text-paper" : "text-ink hover:bg-wash"}`}
               >
                 {i.label}
               </Link>
