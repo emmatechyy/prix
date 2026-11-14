@@ -55,8 +55,8 @@ export function Provenance({ date, sha, asOf, version, locked, extra }: { date: 
 
 export function NoSnapshot() {
   return (
-    <div role="alert" className="rounded-lg bg-warn-fill/60 px-5 py-4 text-[14.5px]">
-      <p className="font-medium text-warn">No published snapshot yet</p>
+    <div role="alert" className="rounded-lg border border-rule px-5 py-4 text-[14.5px]">
+      <p className="font-medium text-ink">No published snapshot yet</p>
       <p className="mt-1 text-[13.5px] text-muted">Run <code className="num">pnpm snapshot:daily</code>. The daily GitHub Action commits one to data/snapshots/.</p>
     </div>
   );

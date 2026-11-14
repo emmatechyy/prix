@@ -1,4 +1,4 @@
-import { Badge, Card, CardHeader, Delta, PageHeader, SourceError, Sources, TokenLink } from "@/components/ui";
+import { Badge, Card, CardHeader, Delta, SourceError, Sources, TokenLink } from "@/components/ui";
 import { getIndex } from "@/lib/model/index-model";
 import { getIntentsCustody, getIntentsFlows } from "@/lib/model/network";
 import { sectorBreakdown } from "@/lib/model/sectors";
@@ -7,7 +7,8 @@ import { num, pct, usd } from "@/lib/format";
 import { safe } from "@/lib/safe";
 import Link from "next/link";
 import { getPublished } from "@/lib/server/published";
-import { Provenance } from "@/components/snapshot-ui";
+import { SegmentedControl } from "@/components/segmented";
+import { nonOverlapping, observedCoverage } from "@/lib/history/coverage";
 import type { Snapshot } from "@/lib/snapshot/schema";
 import { getLending, LENDING_SOURCE } from "@/lib/rhea/lending";
 
@@ -33,12 +34,14 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
 
   return (
     <>
-      <PageHeader eyebrow="Flows" title="Where capital is moving on NEAR">
-        Three lenses: liquidity by sector on RHEA, net buy/sell pressure per token from the latest swaps, and deposits/withdrawals through NEAR Intents — the chain-abstraction layer that moves assets in and out of NEAR. Every window is stated; short samples are labelled as such.
-      </PageHeader>
-
+      <h2 className="font-serif text-[28px] leading-[1.25] text-ink">Flows</h2>
+      <p className="measure mt-2 mb-4 text-[15px] text-slate">Deposits into and withdrawals out of NEAR Intents, the layer that moves assets in and out of NEAR. Every window states how much of it was actually observed.</p>
       <div className="grid gap-4">
-        {pub.snapshot && <SampledFlows s={pub.snapshot} w={w} version={pub.thresholds.t.version} locked={pub.thresholds.locked} />}
+        {pub.snapshot && <SampledFlows s={pub.snapshot} w={w} />}
+      </div>
+      <details className="mt-4 rounded-lg border border-rule bg-surface">
+        <summary className="flex min-h-11 cursor-pointer items-center px-4 text-[15px] font-medium text-ink">More flow detail: liquidity by sector, swap pressure, assets held by NEAR Intents, RHEA Lending</summary>
+      <div className="grid gap-4 p-2 sm:p-4">
         <Card>
           <CardHeader title="Liquidity by sector (RHEA, clean pools)" subtitle="Value of each side of every verified pool, attributed to its token's sector. Pool volume is split 50/50 between its two sides." />
           {sectors ? (
@@ -79,9 +82,9 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
                   {tokenFlows.map((r) => (
                     <tr key={r.id}>
                       <td><TokenLink id={r.id} symbol={r.symbol} /></td>
-                      <td className="r num text-up">{usd(r.flow!.buyUsd)}</td>
-                      <td className="r num text-danger">{usd(r.flow!.sellUsd)}</td>
-                      <td className={`r num ${r.flow!.netUsd >= 0 ? "text-up" : "text-danger"}`}>{usd(r.flow!.netUsd)}</td>
+                      <td className="r num text-ink">{usd(r.flow!.buyUsd)}</td>
+                      <td className="r num text-ink">{usd(r.flow!.sellUsd)}</td>
+                      <td className={`r num ${r.flow!.netUsd >= 0 ? " text-ink" : " text-ink"}`}>{usd(r.flow!.netUsd)}</td>
                       <td className="r"><Delta v={r.flow!.pressure} digits={0} /></td>
                       <td className="r num text-muted">{mins(r.flow!.windowMs)}</td>
                       <td className="r"><Delta v={r.trend.tvl7d} /></td>
@@ -95,9 +98,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
           )}
           <Sources urls={["https://api.rhea.finance/get-recent-transaction-swap", "https://api.rhea.finance/get-recent-transaction-dcl-swap"]} note="Pool TVL change is in USD and includes price moves." />
         </Card>
-      </div>
 
-      <div className="mt-4 grid gap-4">
         <Card>
           <CardHeader
             title="NEAR Intents — deposits vs withdrawals by asset"
@@ -114,9 +115,9 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
                       <tr key={r.asset}>
                         <td className="font-medium" title={r.asset}>{r.symbol}</td>
                         <td><Badge>{intentsChain(r.asset)}</Badge></td>
-                        <td className="r num text-up">{usd(r.inUsd)}</td>
-                        <td className="r num text-danger">{usd(r.outUsd)}</td>
-                        <td className={`r num ${r.netUsd >= 0 ? "text-up" : "text-danger"}`}>{usd(r.netUsd)}</td>
+                        <td className="r num text-ink">{usd(r.inUsd)}</td>
+                        <td className="r num text-ink">{usd(r.outUsd)}</td>
+                        <td className={`r num ${r.netUsd >= 0 ? " text-ink" : " text-ink"}`}>{usd(r.netUsd)}</td>
                         <td className="r num text-muted">{r.events}{r.unpriced ? <span className="text-faint"> ({r.unpriced} unpriced)</span> : null}</td>
                       </tr>
                     ))}
@@ -150,7 +151,7 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
                   ))}
                 </tbody>
               </table>
-              {custody.v.flagged.length > 0 && <p className="border-t border-border px-5 py-3 text-[13px] sm:px-6 text-warn">Excluded as likely mispriced (value &gt;10× the next asset): {custody.v.flagged.map((f) => `${f.symbol} (${usd(f.usd)})`).join(", ")}</p>}
+              {custody.v.flagged.length > 0 && <p className="border-t border-border px-5 py-3 text-[13px] sm:px-6 text-ink">Excluded as likely mispriced (value &gt;10× the next asset): {custody.v.flagged.map((f) => `${f.symbol} (${usd(f.usd)})`).join(", ")}</p>}
             </div>
           ) : (
             <div className="px-5 pb-5 sm:px-6"><SourceError what="Intents balances" error={custody.e} /></div>
@@ -183,71 +184,58 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
           <Sources urls={["https://nearblocks.io/address/contract.main.burrow.near", "https://www.npmjs.com/package/@rhea-finance/cross-chain-sdk"]} note={LENDING_SOURCE} />
         </Card>
       </div>
+      </details>
     </>
   );
 }
 
-/** §8.7: sampled NEAR Intents flows over a selectable window, from the published snapshot. */
-function SampledFlows({ s, w, version, locked }: { s: Snapshot; w: W; version: number; locked: boolean }) {
+/** Sampled NEAR Intents flows over a selectable window, from the published snapshot, with coverage. */
+function SampledFlows({ s, w }: { s: Snapshot; w: W }) {
   const end = Date.parse(s.as_of);
-  const stats = (days: number) => {
-    const bs = s.series.flow_buckets.filter((b) => Date.parse(b.end) <= end && Date.parse(b.start) >= end - days * 86400000);
-    const dep = bs.reduce((a, b) => a + b.deposits_usd, 0);
-    const wd = bs.reduce((a, b) => a + b.withdrawals_usd, 0);
-    return {
-      n: bs.length,
-      events: bs.reduce((a, b) => a + b.events, 0),
-      mints: bs.reduce((a, b) => a + b.mints, 0),
-      burns: bs.reduce((a, b) => a + b.burns, 0),
-      unpriced: bs.reduce((a, b) => a + b.unpriced, 0),
-      minutes: bs.reduce((a, b) => a + (Date.parse(b.end) - Date.parse(b.start)) / 60000, 0),
-      dep,
-      wd,
-      first: bs[0]?.start ?? null,
-    };
-  };
-  const cur = stats(WINDOWS[w]);
+  const days = WINDOWS[w];
+  const bs = nonOverlapping(s.series.flow_buckets.filter((b) => Date.parse(b.end) <= end && Date.parse(b.start) >= end - days * 86400000));
+  const dep = bs.reduce((a, b) => a + (b.deposits_usd ?? 0), 0);
+  const wd = bs.reduce((a, b) => a + (b.withdrawals_usd ?? 0), 0);
+  const events = bs.reduce((a, b) => a + b.events, 0);
+  const unpriced = bs.reduce((a, b) => a + b.unpriced, 0);
+  const cov = observedCoverage(bs, end, days);
+  const hours = (h: number) => (h < 1 ? `${Math.round(h * 60)} min` : `${h.toFixed(1)}h`);
   return (
-    <Card>
-      <CardHeader
-        title="NEAR Intents: sampled deposits vs withdrawals"
-        subtitle={
-          <>
-            One page of up to 100 intents.near events is read every 30 minutes (and every 3 hours for the backfill). MINT = deposit, BURN = withdrawal, each valued at the price NearBlocks reports for the event. These are <strong className="text-text">samples, not totals</strong>: PRIX sums what was sampled and never scales it up.
-            <Provenance date={s.date} sha={s.sha256} asOf={s.as_of} version={version} locked={locked} />
-          </>
-        }
-      />
-      <nav aria-label="Window" className="flex gap-1.5 px-5 pb-4 sm:px-6">
-        {(Object.keys(WINDOWS) as W[]).map((k) => (
-          <Link key={k} href={`/capital?w=${k}#flows`} scroll={false} aria-current={k === w ? "page" : undefined} className={`rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors ${k === w ? "bg-accent text-on-accent" : "border border-border-strong text-text hover:bg-tint"}`}>
-            {k}
-          </Link>
-        ))}
-      </nav>
-      {cur.n === 0 ? (
-        <p className="px-5 pb-5 text-[14.5px] text-muted sm:px-6">No sampled windows in the last {w} of this snapshot: not reported.</p>
+    <section aria-label="Sampled NEAR Intents flows" className="min-w-0 rounded-lg border border-rule bg-surface p-4 sm:p-5">
+      <SegmentedControl label="Flow window" current={w} items={(Object.keys(WINDOWS) as W[]).map((k) => ({ key: k, label: k, href: `/capital?w=${k}#flows` }))} />
+      {cov.share < 1 && (
+        <p className="mt-3 text-[15px] text-ink">
+          <span className="font-semibold">{hours(cov.hours)} of {w === "24h" ? "24h" : `${days * 24}h`} observed</span> ({(cov.share * 100).toFixed(cov.share < 0.1 ? 1 : 0)}%). Totals below are sums of what was read, never scaled up.
+        </p>
+      )}
+      {bs.length === 0 ? (
+        <p className="mt-3 text-[15px] text-slate">Flow history fills in as data is collected: nothing observed in the last {w} of snapshot {s.date} yet.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-2 px-5 pb-5 sm:grid-cols-4 sm:px-6">
-          {[
-            ["Sampled deposits", usd(cur.dep), "text-up"],
-            ["Sampled withdrawals", usd(cur.wd), "text-danger"],
-            ["Sampled net", usd(cur.dep - cur.wd), cur.dep >= cur.wd ? "text-up" : "text-danger"],
-            ["Events read", num(cur.events), "text-ink"],
-          ].map(([l, v, c]) => (
-            <div key={l} className="rounded-lg bg-tint px-4 py-4">
-              <p className="text-[13.5px] text-muted">{l}</p>
-              <p className={`mt-2 font-serif text-[26px] leading-none sm:text-[30px] ${c}`}>{v}</p>
-            </div>
-          ))}
-          <p className="col-span-2 text-[13px] text-muted sm:col-span-4">
-            {num(cur.n)} sampled windows covering {cur.minutes < 120 ? `${cur.minutes.toFixed(1)} min` : `${(cur.minutes / 60).toFixed(1)} h`} of activity since {cur.first?.slice(0, 16).replace("T", " ")} UTC · {num(cur.mints)} mints, {num(cur.burns)} burns, {num(cur.unpriced)} unpriced (excluded) · plain sum of the samples (H5 uses a day-weighted sum so denser sampling on recent days does not dominate; see{" "}
-            <Link href="/#h5" className="underline underline-offset-4 hover:text-text">H5</Link>) ·{" "}
-            <a href={`/api/v1/snapshots/${s.date}`} className="underline underline-offset-4 hover:text-text">snapshot</a> ·{" "}
-            <a href="https://api.nearblocks.io/v3/intents/txns?limit=100" target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text">NearBlocks /v3/intents/txns ↗</a>
-          </p>
+        <div className="scroll-x mt-3">
+          <table className="data">
+            <caption className="sr-only">Observed deposits, withdrawals and net flow, last {w}</caption>
+            <tbody>
+              {[
+                ["Deposits (observed)", usd(dep)],
+                ["Withdrawals (observed)", usd(wd)],
+                ["Net (observed)", usd(dep - wd)],
+                ["Events read", `${num(events)}${unpriced ? ` (${num(unpriced)} unpriced, left out)` : ""}`],
+              ].map(([l, v]) => (
+                <tr key={l}>
+                  <th scope="row" className="!static !bg-transparent !text-[15px] !font-normal !text-ink">{l}</th>
+                  <td className="r num font-semibold">{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-    </Card>
+      <p className="mt-3 text-[13px] text-slate">
+        MINT = deposit, BURN = withdrawal, valued at the price NearBlocks records on each event. H5 uses a day-weighted version of these numbers; see{" "}
+        <Link href="/#h5" className="text-ink underline underline-offset-4">H5</Link>. Sources:{" "}
+        <a href={`/api/v1/snapshots/${s.date}`} className="text-ink underline underline-offset-4">snapshot {s.date}</a>,{" "}
+        <a href="https://api.nearblocks.io/v3/intents/txns?limit=100" target="_blank" rel="noreferrer" className="text-ink underline underline-offset-4">NearBlocks intents events</a>.
+      </p>
+    </section>
   );
 }

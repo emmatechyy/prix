@@ -48,7 +48,7 @@ export async function WhalesView() {
                     {w.v.swaps.slice(0, 40).map((s) => (
                       <tr key={s.receipt_id}>
                         <td className="num text-muted" title={new Date(s.ts).toISOString()}>{ago(s.ts)}</td>
-                        <td><span className="text-danger">{s.symbols[0]}</span> <span className="text-faint">→</span> <span className="text-up">{s.symbols[1]}</span></td>
+                        <td><span className=" text-ink">{s.symbols[0]}</span> <span className="text-faint">→</span> <span className=" text-ink">{s.symbols[1]}</span></td>
                         <td className="r num">{usd(s.usd)}</td>
                         <td><Account id={s.signer} /></td>
                         <td><Tx hash={s.txHash} receipt={s.receipt_id} /></td>
@@ -99,8 +99,8 @@ export async function WhalesView() {
                         <tr key={a.account}>
                           <td><Account id={a.account} /></td>
                           <td className="r num">{a.swapUsd ? usd(a.swapUsd) : "—"}</td>
-                          <td className="r num text-up">{a.lpAddUsd ? usd(a.lpAddUsd) : "—"}</td>
-                          <td className="r num text-danger">{a.lpRemoveUsd ? usd(a.lpRemoveUsd) : "—"}</td>
+                          <td className="r num text-ink">{a.lpAddUsd ? usd(a.lpAddUsd) : "—"}</td>
+                          <td className="r num text-ink">{a.lpRemoveUsd ? usd(a.lpRemoveUsd) : "—"}</td>
                           <td className="r num text-muted">{a.events}</td>
                         </tr>
                       ))}

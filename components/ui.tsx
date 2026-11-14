@@ -91,7 +91,7 @@ export function NotReported({ why }: { why?: string }) {
 
 export function ScoreBar({ score, size = "md" }: { score: number | null; size?: "sm" | "md" }) {
   if (score == null) return <NotReported why="Less than half of the score's weight had data" />;
-  const color = score >= 60 ? "bg-accent" : score >= 35 ? "bg-accent/45" : "bg-danger-fill";
+  const color = score >= 60 ? "bg-accent" : score >= 35 ? "bg-accent/45" : "bg-accent/20";
   return (
     <div className="flex items-center gap-2.5" aria-label={`Score ${score} of 100`}>
       <span className={`num ${size === "md" ? "w-10 text-[14px]" : "w-9 text-[13px]"} text-right text-ink`}>{score.toFixed(1)}</span>
@@ -108,7 +108,7 @@ export function SourceLink({ href, compact, label }: { href: string; compact?: b
   if (!isUrl) return <span className="num text-[13px] text-faint">{label ?? decodeURIComponent(href)}</span>;
   const host = internal ? href : new URL(href).host;
   return (
-    <a href={href} target="_blank" rel="noreferrer" className="text-[13px] text-faint underline-offset-4 transition-colors hover:text-text hover:underline" title={href}>
+    <a href={href} target="_blank" rel="noreferrer" className={`text-[13px] text-faint underline-offset-4 transition-colors hover:text-text hover:underline ${compact ? "inline-flex min-h-11 min-w-11 items-center justify-center" : ""}`} title={href}>
       <span className="break-all">{compact ? "src ↗" : (label ?? host) + " ↗"}</span>
     </a>
   );
@@ -146,7 +146,7 @@ export function SourceError({ what }: { what: string; error?: string }) {
 
 export function TokenLink({ id, symbol, sub }: { id: string; symbol: string; sub?: string }) {
   return (
-    <Link href={`/token/${encodeURIComponent(id)}`} className="group inline-flex min-w-0 flex-col">
+    <Link href={`/token/${encodeURIComponent(id)}`} className="group inline-flex min-h-11 min-w-11 flex-col justify-center">
       <span className="font-medium text-ink transition-colors group-hover:text-accent group-hover:underline">{symbol}</span>
       {sub && <span className="max-w-[180px] truncate text-[13px] text-faint">{sub}</span>}
     </Link>

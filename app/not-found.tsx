@@ -1,12 +1,15 @@
-import { PillLink } from "@/components/ui";
+import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className=" mx-auto max-w-xl py-16 text-center">
-      <p className="text-[17px] text-muted">404</p>
-      <h1 className="display mt-4 text-[48px] text-text sm:text-[72px]">Not in PRIX&apos;s data</h1>
-      <p className="mt-4 text-[16px] leading-[1.6] text-muted">The page or token contract was not found in RHEA&apos;s token list or pools.</p>
-      <div className="mt-8"><PillLink href="/tokens">Browse tokens</PillLink></div>
+    <div className="measure py-12">
+      <h1 className="font-serif text-[28px] leading-[1.2] text-ink">Not in PRIX’s data</h1>
+      <p className="mt-3 text-[17px] text-slate">This page, or this token contract, isn’t in RHEA’s token list or pools.</p>
+      <p className="mt-4">
+        <Link href="/tokens" className="inline-flex min-h-11 items-center rounded-lg bg-ink px-5 text-[15px] font-medium text-paper">
+          Browse tokens
+        </Link>
+      </p>
     </div>
   );
 }

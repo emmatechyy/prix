@@ -20,7 +20,9 @@ const TABS = [
 ] as const;
 
 export default async function Capital({ searchParams }: PageProps<"/capital">) {
-  const sp = searchParams.then((p) => ({ w: typeof p.w === "string" ? p.w : undefined }));
+  const raw = await searchParams;
+  const sp = Promise.resolve({ w: typeof raw.w === "string" ? raw.w : undefined });
+  const route = raw.route === "intents" || raw.route === "rhea" ? raw.route : "best";
   const { snapshot: s } = await getPublished();
   return (
     <>
@@ -42,7 +44,7 @@ export default async function Capital({ searchParams }: PageProps<"/capital">) {
           <FlowsView searchParams={sp} />
         </section>
         <section id="depth" aria-label="Depth" className="scroll-mt-32">
-          <DepthView />
+          <DepthView route={route} />
         </section>
         <section id="network" aria-labelledby="network-h" className="scroll-mt-32">
           <h2 id="network-h" className="mb-5 font-serif text-[28px] leading-[1.25] text-ink">Network</h2>

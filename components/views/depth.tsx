@@ -1,92 +1,121 @@
 import Link from "next/link";
-import { Badge, Card, CardHeader, PageHeader, STAT_GRID, Stat, type Tone } from "@/components/ui";
-import { NoSnapshot, Provenance, snapshotApi } from "@/components/snapshot-ui";
+import { NoSnapshot, snapshotApi } from "@/components/snapshot-ui";
+import { SegmentedControl } from "@/components/segmented";
 import { getPublished } from "@/lib/server/published";
 import { DEPTH_SIZES } from "@/lib/depth/slippage";
-import type { DepthRow } from "@/lib/snapshot/schema";
+import { cellFor, heat, type Cell, type RouteView } from "@/lib/depth/matrix";
+import { utc } from "@/lib/format";
 
-
-
-const STATUS_TONE: Record<DepthRow["status"], Tone> = { ok: "up", "no-route": "neutral", error: "danger", paused: "warn", "rate-limited": "warn", "not-configured": "neutral" };
 const sizeLabel = (n: number) => (n >= 1e6 ? `$${n / 1e6}M` : `$${n / 1e3}k`);
+const ROUTE_LABEL: Record<RouteView, string> = { intents: "NEAR Intents", rhea: "RHEA", best: "Best of both" };
 
-function Cell({ r }: { r: DepthRow | undefined }) {
-  if (!r) return <span className="text-faint">—</span>;
-  if (r.status !== "ok") return <Badge tone={STATUS_TONE[r.status]} title={r.error}>{r.status}</Badge>;
-  if (r.size_usd === 1000 && r.relative_slippage === 0) return <span className="text-[13px] text-faint" title={`Baseline quote: in $${r.amount_in_usd?.toFixed(2)} → out $${r.amount_out_usd?.toFixed(2)}`}>baseline</span>;
-  if (r.relative_slippage == null) return <span className="text-[13px] text-faint" title="No $1k baseline quote on this route">no baseline</span>;
-  const v = r.relative_slippage;
-  const cls = v <= 0.01 ? "text-up" : v <= 0.1 ? "text-warn" : "text-danger";
+function CellView({ c, token, size }: { c: Cell; token: string; size: number }) {
+  if (c.kind === "none") return <span className="text-[13px] text-slate">Not quoted</span>;
+  const r = c.row;
+  const route = r.route === "intents" ? `NEAR Intents 1Click, from ${r.origin}` : r.router_version;
+  const pct = c.kind === "value" ? (c.baseline ? "Baseline" : `${(c.slippage * 100).toFixed(2)}%`) : c.label;
+  const h = c.kind === "value" ? heat(c.slippage) : 0;
   return (
-    <span className={`num ${cls}`} title={`in $${r.amount_in_usd?.toFixed(2)} → out $${r.amount_out_usd?.toFixed(2)}${r.app_fee_bps ? ` · app fee ${r.app_fee_bps} bps ($${r.fee_usd?.toFixed(2)}), excluded from slippage` : ""} · ${r.router_version} · ${r.quote_ms ?? "?"} ms`}>
-      {(v * 100).toFixed(2)}%
-    </span>
+    <details className="group relative">
+      <summary
+        className={`flex min-h-11 min-w-[84px] cursor-pointer list-none items-center justify-end rounded px-2 text-[15px] [&::-webkit-details-marker]:hidden ${c.kind === "status" ? "hatch text-[13px] text-ink" : "num"}`}
+        style={c.kind === "value" ? { background: `color-mix(in srgb, var(--ink) ${h}%, var(--surface))`, color: h > 34 ? "var(--paper)" : "var(--ink)" } : undefined}
+        aria-label={`${token} at ${sizeLabel(size)}: ${c.kind === "value" ? (c.baseline ? "baseline quote" : `${pct} slippage`) : c.label}. Show quote details`}
+      >
+        {pct}
+      </summary>
+      <div className="absolute right-0 z-20 mt-1 w-64 rounded-lg border border-rule bg-surface p-3 text-left text-[13px] leading-relaxed whitespace-normal text-ink">
+        <p className="font-semibold">{route}</p>
+        {c.kind === "value" ? (
+          <p className="num">
+            In ${r.amount_in_usd?.toFixed(2)} → out ${r.amount_out_usd?.toFixed(2)}
+          </p>
+        ) : (
+          <p>{c.label}: no usable quote at this size. Nothing is filled in.</p>
+        )}
+        <p>Fee: {r.app_fee_bps ? `${r.app_fee_bps} bps app fee ($${r.fee_usd?.toFixed(2)}), excluded from slippage` : "no flat app fee"}</p>
+        <p>Quote time: {r.quote_ms != null ? `${r.quote_ms} ms` : "Not reported"}</p>
+        <p>Fetched {utc(r.fetched_at)}</p>
+      </div>
+    </details>
   );
 }
 
-export async function DepthView() {
-  const { snapshot: s, thresholds } = await getPublished();
-  if (!s) return (<><PageHeader eyebrow="Depth" title="Depth matrix" /><NoSnapshot /></>);
+export async function DepthView({ route = "best" }: { route?: RouteView }) {
+  const { snapshot: s } = await getPublished();
+  if (!s) return <NoSnapshot />;
   const rows = s.depth;
   const counts = rows.reduce<Record<string, number>>((a, r) => ((a[r.status] = (a[r.status] ?? 0) + 1), a), {});
+  const failed = (counts.error ?? 0) + (counts.paused ?? 0) + (counts["rate-limited"] ?? 0);
   const order = s.index.map((r) => r.token_id);
   const sym = new Map(s.index.map((r) => [r.token_id, r.symbol]));
-  const groups = new Map<string, Map<string, DepthRow[]>>();
-  for (const r of rows) {
-    const lane = r.route === "intents" ? (r.origin === "any" ? "NEAR Intents · not listed" : `NEAR Intents · from ${r.origin}`) : r.router.startsWith("amm-math") ? "RHEA · AMM reserve math" : "RHEA Smart Router V1 · sell for USDC";
-    const g = groups.get(r.token_id) ?? new Map<string, DepthRow[]>();
-    g.set(lane, [...(g.get(lane) ?? []), r]);
-    groups.set(r.token_id, g);
-  }
-  const tokens = [...groups.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  const tokens = [...new Set(rows.map((r) => r.token_id))].sort((a, b) => (order.indexOf(a) + 1 || 1e9) - (order.indexOf(b) + 1 || 1e9));
+  const lastOk = rows.filter((r) => r.route === "intents" && r.status === "ok").map((r) => r.fetched_at).sort().at(-1);
+  const intentsDown = rows.some((r) => r.route === "intents" && (r.status === "paused" || r.status === "rate-limited"));
   return (
     <>
-      <PageHeader eyebrow="Depth" title="What a real order would cost, by size and route.">
-        Relative slippage = 1 − (out/in at size) ÷ (out/in of the $1k quote on the same route), both net of any flat app fee: until PRIX has a 1Click partner key every 1Click quote carries a 0.2% (20 bps) fee, which is reported as its own field and removed before slippage is computed. Every row names its router and version. NEAR Intents rows are 1Click <strong className="text-text">dry-run</strong> quotes that buy the token with BTC, ETH or SOL; dry quotes return no deposit address, so nothing can be sent. RHEA rows sell the token for USDC through the Smart Router. Failed, paused and rate-limited quotes are shown, never hidden or filled in.
-        <Provenance date={s.date} sha={s.sha256} asOf={s.as_of} version={thresholds.t.version} locked={thresholds.locked} />
-      </PageHeader>
-      <div className={STAT_GRID}>
-        <Stat label="Quotes attempted" value={s.depth_meta.quotes_attempted} sub={`1Click cap ${s.depth_meta.cap} per run, concurrency 3`} source={snapshotApi(s.date)} />
-        <Stat label="Rows ok" value={counts.ok ?? 0} sub={`of ${rows.length} rows`} tone="up" />
-        <Stat label="No route" value={counts["no-route"] ?? 0} sub="no liquidity or not listed" />
-        <Stat label="Errors · paused · rate-limited" value={`${counts.error ?? 0} · ${counts.paused ?? 0} · ${counts["rate-limited"] ?? 0}`} tone={(counts.error ?? 0) + (counts.paused ?? 0) + (counts["rate-limited"] ?? 0) ? "warn" : undefined} sub="shown in the matrix" />
-        <Stat label="Auth" value={s.depth_meta.oneclick_auth === "none" ? "none" : s.depth_meta.oneclick_auth} sub={`1Click ${s.depth_meta.oneclick_auth === "none" ? "unauthenticated (20 bps app fee, reported separately, excluded from slippage)" : "key configured"} · RHEA aggregator V2 ${s.depth_meta.aggregator_auth}`} />
+      <h2 className="font-serif text-[28px] leading-[1.25] text-ink">Depth</h2>
+      <p className="measure mt-2 text-[15px] text-slate">
+        What an order of each size would cost, compared with a $1k order on the same route. Cell = relative slippage, net of any flat app fee. NEAR Intents rows are dry-run quotes (nothing can be sent); RHEA rows are Smart Router quotes. {rows.length} quotes, {counts.ok ?? 0} measured, {counts["no-route"] ?? 0} with no route, {failed} failed, paused or rate-limited, all shown. From snapshot{" "}
+        <a href={snapshotApi(s.date)} className="num text-ink underline underline-offset-4">
+          {s.date}
+        </a>
+        .
+      </p>
+      {intentsDown && lastOk && <p className="mt-2 text-[15px] text-ink">NEAR Intents quotes were unavailable for part of this run. Showing the last successful quotes from {utc(lastOk)}.</p>}
+      <div className="mt-4 mb-3">
+        <SegmentedControl
+          label="Depth route"
+          current={route}
+          items={(["intents", "rhea", "best"] as const).map((k) => ({ key: k, label: k === "best" ? "Best" : k === "intents" ? "Intents" : "RHEA", href: `/capital?route=${k}#depth` }))}
+        />
       </div>
-      <Card className="mt-4">
-        <CardHeader title="Matrix" subtitle={<>Green ≤ 1% · amber ≤ 10% · red &gt; 10%. Hover a cell for amounts and latency, or a status for the upstream message. Raw rows: <a className="underline underline-offset-4 hover:text-text" href="/api/v1/depth">/api/v1/depth</a>.</>} />
-        <div className="scroll-x">
-          <table className="data">
-            <thead>
-              <tr>
-                <th>Token</th>
-                <th>Route</th>
-                {DEPTH_SIZES.map((z) => <th key={z} className="r">{sizeLabel(z)}</th>)}
+      <div className="scroll-x rounded-lg border border-rule bg-surface">
+        <table className="data [&_td:first-child]:sticky [&_td:first-child]:left-0 [&_td:first-child]:z-10 [&_td:first-child]:bg-surface [&_th:first-child]:left-0 [&_th:first-child]:z-20">
+          <caption className="sr-only">Relative slippage by token and order size, {ROUTE_LABEL[route]}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Token</th>
+              {DEPTH_SIZES.map((z) => (
+                <th key={z} scope="col" className="r">
+                  {sizeLabel(z)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {tokens.map((t) => (
+              <tr key={t}>
+                <th scope="row" className="!static !border-b-rule !bg-surface !text-[15px] !font-medium !text-ink">
+                  <Link href={`/token/${encodeURIComponent(t)}`} className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+                    {sym.get(t) ?? t}
+                  </Link>
+                </th>
+                {DEPTH_SIZES.map((z) => (
+                  <td key={z} className="r !px-1 !py-1">
+                    <CellView c={cellFor(rows, t, z, route)} token={sym.get(t) ?? t} size={z} />
+                  </td>
+                ))}
               </tr>
-            </thead>
-            <tbody>
-              {tokens.flatMap((t) =>
-                [...groups.get(t)!.entries()].map(([lane, rs], i) => (
-                  <tr key={t + lane}>
-                    <td>{i === 0 ? <Link href={`/token/${encodeURIComponent(t)}`} className="font-medium text-ink hover:text-accent hover:underline">{sym.get(t) ?? t}</Link> : null}</td>
-                    <td className="text-[13.5px] whitespace-nowrap text-muted">
-                      {lane}
-                      <span className="block text-[13px] text-faint">
-                        {rs[0].router_version}
-                        {rs.some((r) => r.app_fee_bps) ? ` · app fee ${Math.max(...rs.map((r) => r.app_fee_bps ?? 0))} bps, reported separately` : ""}
-                      </span>
-                    </td>
-                    {DEPTH_SIZES.map((z) => <td key={z} className="r"><Cell r={rs.find((r) => r.size_usd === z)} /></td>)}
-                  </tr>
-                )),
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="border-t border-border px-5 py-3.5 text-[13px] text-faint sm:px-6">
-          Sources: <a className="underline underline-offset-4 hover:text-text" href="https://1click.chaindefuser.com/docs/v0/openapi.yaml" target="_blank" rel="noreferrer">1Click /v0/quote (dry:true)</a> ·{" "}
-          <a className="underline underline-offset-4 hover:text-text" href="https://smartrouter.rhea.finance/findPath" target="_blank" rel="noreferrer">smartrouter.rhea.finance/findPath</a> · AMM math = (1 − fee)·X/(X + x) on the deepest clean pool&apos;s reserves (evidence grade C) · <a className="underline underline-offset-4 hover:text-text" href={snapshotApi(s.date)}>snapshot {s.date}</a>
-        </div>
-      </Card>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2 text-[13px] text-slate">
+        Darker = costlier. Hatched cells had no usable quote. Tap a cell for the route, fee, quote time and fetch time. Raw rows:{" "}
+        <a href="/api/v1/depth" className="text-ink underline underline-offset-4">
+          /api/v1/depth
+        </a>
+        . Sources:{" "}
+        <a href="https://1click.chaindefuser.com/docs/v0/openapi.yaml" className="text-ink underline underline-offset-4" target="_blank" rel="noreferrer">
+          1Click quotes
+        </a>
+        ,{" "}
+        <a href="https://smartrouter.rhea.finance/findPath" className="text-ink underline underline-offset-4" target="_blank" rel="noreferrer">
+          RHEA Smart Router
+        </a>
+        .
+      </p>
     </>
   );
 }

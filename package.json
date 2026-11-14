@@ -20,7 +20,6 @@
     "@rhea-finance/cross-chain-aggregation-dex": "^2.1.9",
     "@rhea-finance/cross-chain-sdk": "^0.1.22",
     "geist": "^1.9.2",
-    "lightweight-charts": "^5.3.0",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -41,7 +40,7 @@
     "zod": "^4.6.7"
   },
   "packageManager": "pnpm@10.34.9",
-  "description": "PRIX \u2014 evidence-graded smart index layer for NEAR on-chain markets (read-only).",
+  "description": "PRIX — evidence-graded smart index layer for NEAR on-chain markets (read-only).",
   "license": "MIT",
   "engines": {
     "node": ">=20.9"

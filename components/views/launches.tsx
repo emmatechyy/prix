@@ -8,7 +8,7 @@ import { safe } from "@/lib/safe";
 
 function C({ v }: { v: number | null }) {
   if (v == null) return <span className="text-[13px] text-faint italic">n/r</span>;
-  return <span className={`num text-xs ${v >= 60 ? "text-up" : v >= 35 ? "text-warn" : "text-danger"}`}>{v.toFixed(0)}</span>;
+  return <span className={`num text-xs ${v >= 60 ? " text-ink" : v >= 35 ? " text-ink" : " text-ink"}`}>{v.toFixed(0)}</span>;
 }
 
 export async function LaunchesView() {
