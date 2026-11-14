@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SegmentedControl } from "@/components/segmented";
 import { RankingView } from "@/components/views/ranking";
 import { WhalesView } from "@/components/views/whales";
@@ -30,9 +31,11 @@ export default async function Tokens({ searchParams }: PageProps<"/tokens">) {
       <div className="mt-5 mb-6">
         <SegmentedControl label="Token views" items={[...VIEWS]} current={view} />
       </div>
-      {view === "ranking" && <RankingView showLow={sp.low === "1"} sort={typeof sp.sort === "string" ? sp.sort : undefined} />}
-      {view === "whales" && <WhalesView />}
-      {view === "launches" && <LaunchesView />}
+      <Suspense key={view} fallback={<p className="flex min-h-11 items-center rounded-lg border border-rule bg-surface px-4 text-[15px] text-slate">Loading live token data…</p>}>
+        {view === "ranking" && <RankingView showLow={sp.low === "1"} sort={typeof sp.sort === "string" ? sp.sort : undefined} />}
+        {view === "whales" && <WhalesView />}
+        {view === "launches" && <LaunchesView />}
+      </Suspense>
     </>
   );
 }

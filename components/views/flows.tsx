@@ -6,6 +6,7 @@ import { intentsChain } from "@/lib/chain";
 import { num, pct, usd } from "@/lib/format";
 import { safe } from "@/lib/safe";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getPublished } from "@/lib/server/published";
 import { SegmentedControl } from "@/components/segmented";
 import { nonOverlapping, observedCoverage } from "@/lib/history/coverage";
@@ -27,11 +28,6 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
   const q = (await searchParams).w;
   const w: W = q === "24h" || q === "30d" ? q : "7d";
   const pub = await getPublished();
-  const lending = await safe(getLending);
-  const [idx, flows, custody] = await Promise.all([safe(getIndex), safe(getIntentsFlows), safe(getIntentsCustody)]);
-  const sectors = idx.ok ? sectorBreakdown(idx.v.market) : null;
-  const tokenFlows = idx.ok ? idx.v.rows.filter((r) => r.flow && r.flow.count > 0).sort((a, b) => Math.abs(b.flow!.netUsd) - Math.abs(a.flow!.netUsd)) : [];
-
   return (
     <>
       <h2 className="font-serif text-[28px] leading-[1.25] text-ink">Flows</h2>
@@ -39,6 +35,21 @@ export async function FlowsView({ searchParams }: { searchParams: Promise<{ w?: 
       <div className="grid gap-4">
         {pub.snapshot && <SampledFlows s={pub.snapshot} w={w} />}
       </div>
+      <Suspense fallback={<p className="mt-4 flex min-h-11 items-center rounded-lg border border-rule bg-surface px-4 text-[15px] text-slate">Loading live flow detail (sectors, swap pressure, assets held, lending)…</p>}>
+        <FlowDetails />
+      </Suspense>
+    </>
+  );
+}
+
+/** Live (not snapshot) detail; streamed after first paint so the page is not held up by upstream APIs. */
+async function FlowDetails() {
+  const lending = await safe(getLending);
+  const [idx, flows, custody] = await Promise.all([safe(getIndex), safe(getIntentsFlows), safe(getIntentsCustody)]);
+  const sectors = idx.ok ? sectorBreakdown(idx.v.market) : null;
+  const tokenFlows = idx.ok ? idx.v.rows.filter((r) => r.flow && r.flow.count > 0).sort((a, b) => Math.abs(b.flow!.netUsd) - Math.abs(a.flow!.netUsd)) : [];
+  return (
+    <>
       <details className="mt-4 rounded-lg border border-rule bg-surface">
         <summary className="flex min-h-11 cursor-pointer items-center px-4 text-[15px] font-medium text-ink">More flow detail: liquidity by sector, swap pressure, assets held by NEAR Intents, RHEA Lending</summary>
       <div className="grid gap-4 p-2 sm:p-4">
