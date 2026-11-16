@@ -7336,9 +7336,344 @@
    "burns": 9,
    "unpriced": 0,
    "source": "https://api.nearblocks.io/v3/intents/txns?limit=100"
+  },
+  {
+   "start": "2026-11-16T22:57:56.885Z",
+   "end": "2026-11-16T22:58:32.912Z",
+   "events": 100,
+   "deposits_usd": 367.2870168702075,
+   "withdrawals_usd": 1943.7527316108296,
+   "mints": 7,
+   "burns": 12,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T22:58:32.912Z",
+   "end": "2026-11-16T22:59:14.730Z",
+   "events": 100,
+   "deposits_usd": 7744.925830400577,
+   "withdrawals_usd": 6.804338328518244,
+   "mints": 7,
+   "burns": 10,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T22:59:14.730Z",
+   "end": "2026-11-16T22:59:51.893Z",
+   "events": 100,
+   "deposits_usd": 10085.780573041426,
+   "withdrawals_usd": 10972.226469755775,
+   "mints": 16,
+   "burns": 9,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T22:59:51.893Z",
+   "end": "2026-11-16T23:00:25.441Z",
+   "events": 100,
+   "deposits_usd": 494.0983973569141,
+   "withdrawals_usd": 307.54881504452527,
+   "mints": 6,
+   "burns": 10,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:00:25.441Z",
+   "end": "2026-11-16T23:01:06.007Z",
+   "events": 100,
+   "deposits_usd": 4319.03327106761,
+   "withdrawals_usd": 6111.813186443516,
+   "mints": 10,
+   "burns": 15,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:01:06.007Z",
+   "end": "2026-11-16T23:01:32.160Z",
+   "events": 100,
+   "deposits_usd": 7138.781397113499,
+   "withdrawals_usd": 1748.7416105629152,
+   "mints": 9,
+   "burns": 8,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:01:32.160Z",
+   "end": "2026-11-16T23:02:19.046Z",
+   "events": 100,
+   "deposits_usd": 1676.081408144997,
+   "withdrawals_usd": 6631.319043042494,
+   "mints": 8,
+   "burns": 10,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:02:19.046Z",
+   "end": "2026-11-16T23:02:52.105Z",
+   "events": 100,
+   "deposits_usd": 16096.319920648686,
+   "withdrawals_usd": 15558.872334911912,
+   "mints": 4,
+   "burns": 13,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:02:52.105Z",
+   "end": "2026-11-16T23:03:34.366Z",
+   "events": 100,
+   "deposits_usd": 25427.35151227862,
+   "withdrawals_usd": 26285.8540131874,
+   "mints": 6,
+   "burns": 9,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:03:34.366Z",
+   "end": "2026-11-16T23:03:59.104Z",
+   "events": 100,
+   "deposits_usd": 360.8984503741824,
+   "withdrawals_usd": 239.85746364423312,
+   "mints": 8,
+   "burns": 7,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:03:59.104Z",
+   "end": "2026-11-16T23:04:40.240Z",
+   "events": 100,
+   "deposits_usd": 4246.577645080647,
+   "withdrawals_usd": 14134.126271548812,
+   "mints": 7,
+   "burns": 20,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:04:40.240Z",
+   "end": "2026-11-16T23:05:08.595Z",
+   "events": 100,
+   "deposits_usd": 20208.277992350733,
+   "withdrawals_usd": 2882.8039429586456,
+   "mints": 7,
+   "burns": 12,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:05:08.595Z",
+   "end": "2026-11-16T23:05:41.596Z",
+   "events": 100,
+   "deposits_usd": 30046.401146742,
+   "withdrawals_usd": 62562.73577047538,
+   "mints": 4,
+   "burns": 12,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:05:41.596Z",
+   "end": "2026-11-16T23:06:17.078Z",
+   "events": 100,
+   "deposits_usd": 2635.86354734035,
+   "withdrawals_usd": 7109.211663054492,
+   "mints": 11,
+   "burns": 13,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:06:17.078Z",
+   "end": "2026-11-16T23:06:50.107Z",
+   "events": 100,
+   "deposits_usd": 1924.7883245646935,
+   "withdrawals_usd": 3034.83623588659,
+   "mints": 12,
+   "burns": 13,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:06:50.107Z",
+   "end": "2026-11-16T23:07:11.766Z",
+   "events": 100,
+   "deposits_usd": 1415.805358934037,
+   "withdrawals_usd": 1361.9850932789425,
+   "mints": 7,
+   "burns": 9,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:07:11.766Z",
+   "end": "2026-11-16T23:07:29.643Z",
+   "events": 100,
+   "deposits_usd": 783.5078058983856,
+   "withdrawals_usd": 581.4492659021054,
+   "mints": 8,
+   "burns": 8,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:07:29.643Z",
+   "end": "2026-11-16T23:08:01.982Z",
+   "events": 100,
+   "deposits_usd": 2704.6542104238497,
+   "withdrawals_usd": 1676.4211677582439,
+   "mints": 8,
+   "burns": 11,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:08:01.982Z",
+   "end": "2026-11-16T23:08:20.235Z",
+   "events": 100,
+   "deposits_usd": 5355.889433601103,
+   "withdrawals_usd": 6161.325427596486,
+   "mints": 9,
+   "burns": 11,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:08:20.235Z",
+   "end": "2026-11-16T23:09:02.714Z",
+   "events": 100,
+   "deposits_usd": 19204.45293940821,
+   "withdrawals_usd": 17422.524316005238,
+   "mints": 9,
+   "burns": 16,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:09:02.714Z",
+   "end": "2026-11-16T23:09:26.241Z",
+   "events": 100,
+   "deposits_usd": 107.41709278573177,
+   "withdrawals_usd": 3772.1135356544314,
+   "mints": 4,
+   "burns": 26,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:09:26.241Z",
+   "end": "2026-11-16T23:10:05.088Z",
+   "events": 100,
+   "deposits_usd": 15036.510453154711,
+   "withdrawals_usd": 7439.358475672873,
+   "mints": 12,
+   "burns": 18,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:10:05.088Z",
+   "end": "2026-11-16T23:10:31.367Z",
+   "events": 100,
+   "deposits_usd": 8275.964801713108,
+   "withdrawals_usd": 8321.82342291231,
+   "mints": 8,
+   "burns": 10,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:10:31.367Z",
+   "end": "2026-11-16T23:11:03.706Z",
+   "events": 100,
+   "deposits_usd": 1704.6641288982532,
+   "withdrawals_usd": 9227.021706481422,
+   "mints": 6,
+   "burns": 13,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:11:03.706Z",
+   "end": "2026-11-16T23:11:40.342Z",
+   "events": 100,
+   "deposits_usd": 884.1336151391349,
+   "withdrawals_usd": 1049.6438663959364,
+   "mints": 9,
+   "burns": 5,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:11:40.342Z",
+   "end": "2026-11-16T23:12:08.342Z",
+   "events": 100,
+   "deposits_usd": 3604.7131295096124,
+   "withdrawals_usd": 5965.090363331453,
+   "mints": 4,
+   "burns": 10,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:12:08.342Z",
+   "end": "2026-11-16T23:12:25.311Z",
+   "events": 100,
+   "deposits_usd": 10056.949936212415,
+   "withdrawals_usd": 3858.7575258291845,
+   "mints": 2,
+   "burns": 11,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:12:25.311Z",
+   "end": "2026-11-16T23:12:40.249Z",
+   "events": 100,
+   "deposits_usd": 200241.3261432138,
+   "withdrawals_usd": 10056.765146487685,
+   "mints": 26,
+   "burns": 3,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:12:40.249Z",
+   "end": "2026-11-16T23:12:50.349Z",
+   "events": 100,
+   "deposits_usd": 6511.806404642775,
+   "withdrawals_usd": 7590.1649517988535,
+   "mints": 8,
+   "burns": 15,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100&next=%3Ccursor%3E"
+  },
+  {
+   "start": "2026-11-16T23:12:50.349Z",
+   "end": "2026-11-16T23:13:03.932Z",
+   "events": 100,
+   "deposits_usd": 806.0071790982377,
+   "withdrawals_usd": 9273.397489356434,
+   "mints": 6,
+   "burns": 22,
+   "unpriced": 0,
+   "source": "https://api.nearblocks.io/v3/intents/txns?limit=100"
   }
  ],
  "gaps": [
+  {
+   "upper_ns": "1794869876885613773",
+   "lower_ns": "1794860433535761086",
+   "next": "eyJpbmRleCI6MSwic2hhcmQiOjcsInRpbWVzdGFtcCI6IjE3OTQ4Njk4NzY4ODU2MTM3NzMifQ=="
+  },
   {
    "upper_ns": "1794859826230887261",
    "lower_ns": "1794857271149846714",
@@ -7410,6 +7745,6 @@
    "next": "eyJpbmRleCI6MCwic2hhcmQiOjcsInRpbWVzdGFtcCI6IjE3OTQ2NDA0Mjg1MDYzNzM1OTUifQ=="
   }
  ],
- "high_ns": "1794860433535761086",
- "updated_at": "2026-11-16T20:20:35.864Z"
+ "high_ns": "1794870783932195364",
+ "updated_at": "2026-11-16T23:13:06.384Z"
 }
