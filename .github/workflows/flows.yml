@@ -11,13 +11,21 @@ permissions:
 concurrency:
   group: prix-data
   cancel-in-progress: false
-jobs:
+ jobs:
   flows:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure Git authentication
+        run: gh auth setup-git
+
       - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
