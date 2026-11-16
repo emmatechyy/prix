@@ -11,7 +11,8 @@ permissions:
 concurrency:
   group: prix-data
   cancel-in-progress: false
- jobs:
+
+jobs:
   flows:
     runs-on: ubuntu-latest
     timeout-minutes: 15
